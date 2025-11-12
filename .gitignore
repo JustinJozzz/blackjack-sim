@@ -1,0 +1,14 @@
+# Build artifacts
+build/
+
+# Object files
+*.o
+*.obj
+
+# Executables
+*.exe
+*.out
+*.app
+
+# macOS
+.DS_Store
