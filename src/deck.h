@@ -1,10 +1,5 @@
 typedef struct {
-    int suit;
-    int value;
-} Card;
-
-typedef struct {
-    Card* cards;
+    int* cards;
     int num_decks;
     int total_cards;
     int position;
@@ -13,5 +8,7 @@ typedef struct {
 void deck_init(Deck* deck, int num_decks);
 
 void deck_shuffle(Deck* deck);
+
+int deck_deal(Deck* deck);
 
 void deck_destroy(Deck* deck);

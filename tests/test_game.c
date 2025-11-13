@@ -26,6 +26,8 @@ TEST(deck_initialization) {
     assert(deck.num_decks == 6);
     assert(deck.total_cards == 312);
     assert(deck.position == 0);
+    assert(deck.cards[0] == 0);
+    assert(deck.cards[1] == 1);
 
     deck_destroy(&deck);
 }
@@ -44,17 +46,20 @@ TEST(deck_shuffle) {
     deck_destroy(&deck);
 }
 
-// TEST(card_dealing) {
-//     Deck deck;
-//     deck_init(&deck, 1);
-//     deck_shuffle(&deck);
+TEST(card_dealing) {
+    Deck deck;
+    deck_init(&deck, 3);
+    deck_shuffle(&deck);
     
-//     Card first_card = deck_deal(&deck);
-//     assert(deck.position == 1);
+    int first_card = deck_deal(&deck);
+    assert(deck.position == 1);
     
-//     Card second_card = deck_deal(&deck);
-//     assert(deck.position == 2);
-// }
+    int second_card = deck_deal(&deck);
+    assert(deck.position == 2);
+    assert(first_card != second_card);
+
+    deck_destroy(&deck);
+}
 
 // Add more tests here as you implement features:
 // TEST(hand_value_calculation) { ... }
@@ -69,7 +74,7 @@ int main(void) {
     // Run all tests
     run_test_deck_initialization();
     run_test_deck_shuffle();
-    // run_test_card_dealing();
+    run_test_card_dealing();
     
     // Add more test runs here as you create them
     // run_test_hand_value_calculation();
