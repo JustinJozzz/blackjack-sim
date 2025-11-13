@@ -21,7 +21,6 @@ TEST_EXECUTABLES = $(TEST_SOURCES:$(TEST_DIR)/%.c=$(BUILD_DIR)/%)
 
 # Targets
 TARGET = blackjack
-TEST_TARGET = test_game
 
 # Default target
 all: $(TARGET)
@@ -47,8 +46,14 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 # Run tests
-test: $(BUILD_DIR)/$(TEST_TARGET)
-	./$(BUILD_DIR)/$(TEST_TARGET)
+# Run all tests
+test: $(TEST_EXECUTABLES)
+	@echo "Running all tests..."
+	@for test in $(TEST_EXECUTABLES); do \
+		echo "\n=== Running $$test ===" ; \
+		./$$test || exit 1; \
+	done
+	@echo "\nAll tests completed!"
 
 # Clean build artifacts
 clean:
