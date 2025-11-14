@@ -13,10 +13,22 @@ This project simulates thousands of blackjack hands to determine the mathematica
 - Custom random number generator (xorshift32)
 - Test framework
 
-🚧 **Next Steps: See IMPLEMENTATION_GUIDE.md**
-- Card utilities
-- Hand value calculation
-- Game logic
+✅ **Phase 1: Card & Hand Management** (11/14 tests passing)
+- Card value calculations (A=11, face=10)
+- Card rank and suit utilities
+- Hand initialization and dynamic array management
+- Hand value calculation with ace handling
+- Soft/hard hand detection
+
+🚧 **Phase 1: Remaining** (3 tests to complete)
+- Blackjack detection
+- Split detection
+- Double detection
+
+⏳ **Next Steps: See IMPLEMENTATION_GUIDE.md**
+- Game rules configuration
+- Dealer logic
+- Game state management
 - Basic strategy
 - Simulation engine
 
@@ -26,16 +38,16 @@ This project simulates thousands of blackjack hands to determine the mathematica
 blackjack-sim/
 ├── src/
 │   ├── deck.c/h          ✅ Deck operations
-│   ├── card.c/h          ⏳ Card utilities (to implement)
-│   ├── hand.c/h          ⏳ Hand management (to implement)
+│   ├── card.c/h          ✅ Card utilities (4/4 tests passing)
+│   ├── hand.c/h          🚧 Hand management (7/10 tests passing)
 │   ├── rules.c/h         ⏳ Game rules (to implement)
 │   ├── dealer.c/h        ⏳ Dealer logic (to implement)
 │   ├── game.c/h          ⏳ Core game logic (to implement)
 │   ├── strategy.c/h      ⏳ Basic strategy (to implement)
 │   └── simulation.c/h    ⏳ Monte Carlo engine (to implement)
 ├── tests/
-│   ├── test_game.c       ✅ Deck tests
-│   ├── test_hand.c       ✅ Card & hand tests (ready to uncomment)
+│   ├── test_game.c       ✅ Deck tests (3/3 passing)
+│   ├── test_hand.c       🚧 Card & hand tests (11/14 passing)
 │   ├── test_game_logic.c ✅ Game logic tests (ready to uncomment)
 │   └── test_strategy.c   ✅ Strategy tests (ready to uncomment)
 ├── ARCHITECTURE.md       📖 System design overview
@@ -45,22 +57,25 @@ blackjack-sim/
 
 ## Quick Start
 
-### Run Current Tests
+### Run All Tests
 ```bash
-make build/test_game
-./build/test_game
+make test
 ```
 
-### Implement Phase 1: Card & Hand
-See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed instructions.
+### Current Test Results
+- ✅ Card utilities: 4/4 tests passing
+- 🚧 Hand management: 11/14 tests passing
+- ⏳ Remaining: Blackjack, split, and double detection
 
+### Complete Phase 1
+Finish implementing the remaining hand functions in [src/hand.c](src/hand.c):
+- `hand_is_blackjack()` - Check for natural 21
+- `hand_can_split()` - Check if two cards have same rank
+- `hand_can_double()` - Check if hand has exactly 2 cards
+
+Then uncomment the remaining tests in [tests/test_hand.c](tests/test_hand.c#L262-L264) and run:
 ```bash
-# 1. Create src/card.c and src/card.h
-# 2. Create src/hand.c and src/hand.h
-# 3. Uncomment tests in tests/test_hand.c
-# 4. Build and test
-make build/test_hand
-./build/test_hand
+make test
 ```
 
 ### Build Everything
@@ -83,9 +98,11 @@ This project follows **Test-Driven Development (TDD)**:
 ## Features to Implement
 
 ### Core Functionality
-- [ ] Card value calculations (A=11, face=10)
-- [ ] Hand value with ace handling
-- [ ] Soft/hard hand detection
+- [x] Card value calculations (A=11, face=10)
+- [x] Card rank and suit utilities
+- [x] Hand initialization and dynamic arrays
+- [x] Hand value with ace handling
+- [x] Soft/hard hand detection
 - [ ] Blackjack detection
 - [ ] Split and double detection
 - [ ] Game rules configuration

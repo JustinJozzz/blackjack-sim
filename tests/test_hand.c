@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "../src/card.h"
-// #include "../src/hand.h"
+#include "../src/hand.h"
 
 // Simple test framework
 int tests_run = 0;
@@ -123,107 +123,113 @@ TEST(card_to_string) {
 // - bool hand_can_split(Hand* hand) - True if two cards of same rank
 // - bool hand_can_double(Hand* hand) - True if hand has exactly 2 cards
 
-// TEST(hand_initialization) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     assert(hand.num_cards == 0);
-//     assert(hand.cards != NULL);
-//
-//     hand_destroy(&hand);
-// }
+TEST(hand_initialization) {
+    Hand hand;
+    hand_init(&hand);
 
-// TEST(hand_add_cards) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     hand_add_card(&hand, 5);  // 6 of some suit
-//     assert(hand.num_cards == 1);
-//     assert(hand.cards[0] == 5);
-//
-//     hand_add_card(&hand, 10); // Jack
-//     assert(hand.num_cards == 2);
-//     assert(hand.cards[1] == 10);
-//
-//     hand_destroy(&hand);
-// }
+    assert(hand.num_cards == 0);
+    assert(hand.cards != NULL);
+    assert(hand.capacity == 2);
 
-// TEST(hand_hard_values) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     // Hard 16 (10 + 6)
-//     hand_add_card(&hand, 9);  // 10
-//     hand_add_card(&hand, 5);  // 6
-//     assert(hand_get_value(&hand) == 16);
-//     assert(hand_is_soft(&hand) == false);
-//
-//     hand_destroy(&hand);
-// }
+    hand_destroy(&hand);
+}
 
-// TEST(hand_soft_values) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     // Soft 17 (Ace + 6)
-//     hand_add_card(&hand, 0);  // Ace
-//     hand_add_card(&hand, 5);  // 6
-//     assert(hand_get_value(&hand) == 17);
-//     assert(hand_is_soft(&hand) == true);
-//
-//     hand_destroy(&hand);
-// }
+TEST(hand_add_cards) {
+    Hand hand;
+    hand_init(&hand);
 
-// TEST(hand_soft_becomes_hard) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     // Soft 17 becomes hard 17 when we add a 10
-//     hand_add_card(&hand, 0);  // Ace (11)
-//     hand_add_card(&hand, 5);  // 6
-//     assert(hand_get_value(&hand) == 17);
-//     assert(hand_is_soft(&hand) == true);
-//
-//     hand_add_card(&hand, 9);  // 10
-//     // Now: A(1) + 6 + 10 = 17 hard
-//     assert(hand_get_value(&hand) == 17);
-//     assert(hand_is_soft(&hand) == false);
-//
-//     hand_destroy(&hand);
-// }
+    hand_add_card(&hand, 5);  // 6 of some suit
+    assert(hand.num_cards == 1);
+    assert(hand.cards[0] == 5);
 
-// TEST(hand_multiple_aces) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     // Two aces = 12 (soft)
-//     hand_add_card(&hand, 0);  // Ace
-//     hand_add_card(&hand, 0);  // Ace
-//     assert(hand_get_value(&hand) == 12);
-//     assert(hand_is_soft(&hand) == true);
-//
-//     // Add 9 -> A(11) + A(1) + 9 = 21
-//     hand_add_card(&hand, 8);  // 9
-//     assert(hand_get_value(&hand) == 21);
-//     assert(hand_is_soft(&hand) == true);
-//
-//     hand_destroy(&hand);
-// }
+    hand_add_card(&hand, 10); // Jack
+    assert(hand.num_cards == 2);
+    assert(hand.cards[1] == 10);
 
-// TEST(hand_bust_with_aces) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     // Ace + 6 + 5 + 5 = 17 (ace as 1)
-//     hand_add_card(&hand, 0);  // Ace
-//     hand_add_card(&hand, 5);  // 6
-//     hand_add_card(&hand, 4);  // 5
-//     hand_add_card(&hand, 4);  // 5
-//     assert(hand_get_value(&hand) == 17);
-//     assert(hand_is_soft(&hand) == false);
-//
-//     hand_destroy(&hand);
-// }
+    // Test Realloc
+    hand_add_card(&hand, 12); // King
+    assert(hand.num_cards == 3);
+    assert(hand.cards[2] == 12);
+
+    hand_destroy(&hand);
+}
+
+TEST(hand_hard_values) {
+    Hand hand;
+    hand_init(&hand);
+
+    // Hard 16 (10 + 6)
+    hand_add_card(&hand, 9);  // 10
+    hand_add_card(&hand, 5);  // 6
+    assert(hand_get_value(&hand) == 16);
+    assert(hand_is_soft(&hand) == false);
+
+    hand_destroy(&hand);
+}
+
+TEST(hand_soft_values) {
+    Hand hand;
+    hand_init(&hand);
+
+    // Soft 17 (Ace + 6)
+    hand_add_card(&hand, 0);  // Ace
+    hand_add_card(&hand, 5);  // 6
+    assert(hand_get_value(&hand) == 17);
+    assert(hand_is_soft(&hand) == true);
+
+    hand_destroy(&hand);
+}
+
+TEST(hand_soft_becomes_hard) {
+    Hand hand;
+    hand_init(&hand);
+
+    // Soft 17 becomes hard 17 when we add a 10
+    hand_add_card(&hand, 0);  // Ace (11)
+    hand_add_card(&hand, 5);  // 6
+    assert(hand_get_value(&hand) == 17);
+    assert(hand_is_soft(&hand) == true);
+
+    hand_add_card(&hand, 9);  // 10
+    // Now: A(1) + 6 + 10 = 17 hard
+    assert(hand_get_value(&hand) == 17);
+    assert(hand_is_soft(&hand) == false);
+
+    hand_destroy(&hand);
+}
+
+TEST(hand_multiple_aces) {
+    Hand hand;
+    hand_init(&hand);
+
+    // Two aces = 12 (soft)
+    hand_add_card(&hand, 0);  // Ace
+    hand_add_card(&hand, 0);  // Ace
+    assert(hand_get_value(&hand) == 12);
+    assert(hand_is_soft(&hand) == true);
+
+    // Add 9 -> A(11) + A(1) + 9 = 21
+    hand_add_card(&hand, 8);  // 9
+    assert(hand_get_value(&hand) == 21);
+    assert(hand_is_soft(&hand) == true);
+
+    hand_destroy(&hand);
+}
+
+TEST(hand_bust_with_aces) {
+    Hand hand;
+    hand_init(&hand);
+
+    // Ace + 6 + 5 + 5 = 17 (ace as 1)
+    hand_add_card(&hand, 0);  // Ace
+    hand_add_card(&hand, 5);  // 6
+    hand_add_card(&hand, 4);  // 5
+    hand_add_card(&hand, 4);  // 5
+    assert(hand_get_value(&hand) == 17);
+    assert(hand_is_soft(&hand) == false);
+
+    hand_destroy(&hand);
+}
 
 // TEST(hand_blackjack_detection) {
 //     Hand hand;
@@ -309,13 +315,13 @@ int main(void) {
     run_test_card_to_string();
 
     // Hand tests
-    // run_test_hand_initialization();
-    // run_test_hand_add_cards();
-    // run_test_hand_hard_values();
-    // run_test_hand_soft_values();
-    // run_test_hand_soft_becomes_hard();
-    // run_test_hand_multiple_aces();
-    // run_test_hand_bust_with_aces();
+    run_test_hand_initialization();
+    run_test_hand_add_cards();
+    run_test_hand_hard_values();
+    run_test_hand_soft_values();
+    run_test_hand_soft_becomes_hard();
+    run_test_hand_multiple_aces();
+    run_test_hand_bust_with_aces();
     // run_test_hand_blackjack_detection();
     // run_test_hand_split_detection();
     // run_test_hand_double_detection();
