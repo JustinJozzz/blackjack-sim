@@ -231,76 +231,76 @@ TEST(hand_bust_with_aces) {
     hand_destroy(&hand);
 }
 
-// TEST(hand_blackjack_detection) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     // Ace + 10 = blackjack
-//     hand_add_card(&hand, 0);  // Ace
-//     hand_add_card(&hand, 9);  // 10
-//     assert(hand_get_value(&hand) == 21);
-//     assert(hand_is_blackjack(&hand) == true);
-//
-//     hand_destroy(&hand);
-//
-//     // But 3 cards to 21 is not blackjack
-//     Hand hand2;
-//     hand_init(&hand2);
-//     hand_add_card(&hand2, 6);  // 7
-//     hand_add_card(&hand2, 6);  // 7
-//     hand_add_card(&hand2, 6);  // 7
-//     assert(hand_get_value(&hand2) == 21);
-//     assert(hand_is_blackjack(&hand2) == false);
-//
-//     hand_destroy(&hand2);
-// }
+TEST(hand_blackjack_detection) {
+    Hand hand;
+    hand_init(&hand);
 
-// TEST(hand_split_detection) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     // Two cards of same rank can split
-//     hand_add_card(&hand, 8);  // 9
-//     hand_add_card(&hand, 8);  // 9
-//     assert(hand_can_split(&hand) == true);
-//
-//     hand_destroy(&hand);
-//
-//     // Two 10-value cards of different ranks can split
-//     Hand hand2;
-//     hand_init(&hand2);
-//     hand_add_card(&hand2, 10);  // Jack
-//     hand_add_card(&hand2, 11);  // Queen
-//     assert(hand_can_split(&hand2) == true);
-//
-//     hand_destroy(&hand2);
-//
-//     // Three cards cannot split
-//     Hand hand3;
-//     hand_init(&hand3);
-//     hand_add_card(&hand3, 5);
-//     hand_add_card(&hand3, 5);
-//     hand_add_card(&hand3, 5);
-//     assert(hand_can_split(&hand3) == false);
-//
-//     hand_destroy(&hand3);
-// }
+    // Ace + 10 = blackjack
+    hand_add_card(&hand, 0);  // Ace
+    hand_add_card(&hand, 9);  // 10
+    assert(hand_get_value(&hand) == 21);
+    assert(hand_is_blackjack(&hand) == true);
 
-// TEST(hand_double_detection) {
-//     Hand hand;
-//     hand_init(&hand);
-//
-//     // Can double with 2 cards
-//     hand_add_card(&hand, 5);
-//     hand_add_card(&hand, 6);
-//     assert(hand_can_double(&hand) == true);
-//
-//     // Cannot double with 3 cards
-//     hand_add_card(&hand, 2);
-//     assert(hand_can_double(&hand) == false);
-//
-//     hand_destroy(&hand);
-// }
+    hand_destroy(&hand);
+
+    // But 3 cards to 21 is not blackjack
+    Hand hand2;
+    hand_init(&hand2);
+    hand_add_card(&hand2, 6);  // 7
+    hand_add_card(&hand2, 6);  // 7
+    hand_add_card(&hand2, 6);  // 7
+    assert(hand_get_value(&hand2) == 21);
+    assert(hand_is_blackjack(&hand2) == false);
+
+    hand_destroy(&hand2);
+}
+
+TEST(hand_split_detection) {
+    Hand hand;
+    hand_init(&hand);
+
+    // Two cards of same rank can split
+    hand_add_card(&hand, 8);  // 9
+    hand_add_card(&hand, 8);  // 9
+    assert(hand_can_split(&hand) == true);
+
+    hand_destroy(&hand);
+
+    // Two 10-value cards of different ranks can split
+    Hand hand2;
+    hand_init(&hand2);
+    hand_add_card(&hand2, 10);  // Jack
+    hand_add_card(&hand2, 11);  // Queen
+    assert(hand_can_split(&hand2) == true);
+
+    hand_destroy(&hand2);
+
+    // Three cards cannot split
+    Hand hand3;
+    hand_init(&hand3);
+    hand_add_card(&hand3, 5);
+    hand_add_card(&hand3, 5);
+    hand_add_card(&hand3, 5);
+    assert(hand_can_split(&hand3) == false);
+
+    hand_destroy(&hand3);
+}
+
+TEST(hand_double_detection) {
+    Hand hand;
+    hand_init(&hand);
+
+    // Can double with 2 cards
+    hand_add_card(&hand, 5);
+    hand_add_card(&hand, 6);
+    assert(hand_can_double(&hand) == true);
+
+    // Cannot double with 3 cards
+    hand_add_card(&hand, 2);
+    assert(hand_can_double(&hand) == false);
+
+    hand_destroy(&hand);
+}
 
 int main(void) {
     printf("Running Hand & Card Tests\n");
@@ -322,9 +322,9 @@ int main(void) {
     run_test_hand_soft_becomes_hard();
     run_test_hand_multiple_aces();
     run_test_hand_bust_with_aces();
-    // run_test_hand_blackjack_detection();
-    // run_test_hand_split_detection();
-    // run_test_hand_double_detection();
+    run_test_hand_blackjack_detection();
+    run_test_hand_split_detection();
+    run_test_hand_double_detection();
 
     printf("\n==================================\n");
     printf("Tests passed: %d/%d\n", tests_passed, tests_run);

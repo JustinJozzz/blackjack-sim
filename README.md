@@ -13,22 +13,28 @@ This project simulates thousands of blackjack hands to determine the mathematica
 - Custom random number generator (xorshift32)
 - Test framework
 
-✅ **Phase 1: Card & Hand Management** (11/14 tests passing)
+✅ **Phase 1: Card & Hand Management** (14/14 tests passing)
 - Card value calculations (A=11, face=10)
 - Card rank and suit utilities
 - Hand initialization and dynamic array management
 - Hand value calculation with ace handling
 - Soft/hard hand detection
-
-🚧 **Phase 1: Remaining** (3 tests to complete)
 - Blackjack detection
 - Split detection
 - Double detection
 
+✅ **Phase 2: Game Rules** (10/10 tests passing)
+- Standard Vegas rules (S17, DAS, LSR, 3:2, 6-deck)
+- Configurable rule variations (H17, 6:5, single deck, etc.)
+
+🚧 **Phase 2: Dealer Logic** (4/4 tests passing)
+- Dealer hit/stand decision logic
+- Soft 17 handling
+
 ⏳ **Next Steps: See IMPLEMENTATION_GUIDE.md**
-- Game rules configuration
-- Dealer logic
 - Game state management
+- Player actions (hit, stand, double, split, surrender)
+- Payout calculations
 - Basic strategy
 - Simulation engine
 
@@ -39,17 +45,19 @@ blackjack-sim/
 ├── src/
 │   ├── deck.c/h          ✅ Deck operations
 │   ├── card.c/h          ✅ Card utilities (4/4 tests passing)
-│   ├── hand.c/h          🚧 Hand management (7/10 tests passing)
-│   ├── rules.c/h         ⏳ Game rules (to implement)
-│   ├── dealer.c/h        ⏳ Dealer logic (to implement)
+│   ├── hand.c/h          ✅ Hand management (14/14 tests passing)
+│   ├── rules.c/h         ✅ Game rules (10/10 tests passing)
+│   ├── dealer.c/h        🚧 Dealer logic (4/4 tests passing)
 │   ├── game.c/h          ⏳ Core game logic (to implement)
 │   ├── strategy.c/h      ⏳ Basic strategy (to implement)
 │   └── simulation.c/h    ⏳ Monte Carlo engine (to implement)
 ├── tests/
 │   ├── test_game.c       ✅ Deck tests (3/3 passing)
-│   ├── test_hand.c       🚧 Card & hand tests (11/14 passing)
-│   ├── test_game_logic.c ✅ Game logic tests (ready to uncomment)
+│   ├── test_hand.c       ✅ Card & hand tests (14/14 passing)
+│   ├── test_rules.c      ✅ Rules tests (10/10 passing)
+│   ├── test_game_logic.c 🚧 Dealer & game tests (4 passing, ready to uncomment more)
 │   └── test_strategy.c   ✅ Strategy tests (ready to uncomment)
+├── .vscode/              🔧 VS Code debug configurations
 ├── ARCHITECTURE.md       📖 System design overview
 ├── IMPLEMENTATION_GUIDE.md 📖 Step-by-step implementation guide
 └── Makefile              🔨 Build system
@@ -63,20 +71,22 @@ make test
 ```
 
 ### Current Test Results
+- ✅ Deck operations: 3/3 tests passing
 - ✅ Card utilities: 4/4 tests passing
-- 🚧 Hand management: 11/14 tests passing
-- ⏳ Remaining: Blackjack, split, and double detection
+- ✅ Hand management: 14/14 tests passing
+- ✅ Game rules: 10/10 tests passing
+- ✅ Dealer logic: 4/4 tests passing
 
-### Complete Phase 1
-Finish implementing the remaining hand functions in [src/hand.c](src/hand.c):
-- `hand_is_blackjack()` - Check for natural 21
-- `hand_can_split()` - Check if two cards have same rank
-- `hand_can_double()` - Check if hand has exactly 2 cards
+**Total: 35/35 tests passing**
 
-Then uncomment the remaining tests in [tests/test_hand.c](tests/test_hand.c#L262-L264) and run:
-```bash
-make test
-```
+### Next Steps
+Implement game state management in [src/game.c](src/game.c) and [src/game.h](src/game.h):
+- Game initialization and cleanup
+- Initial deal (2 cards to player, 2 to dealer)
+- Player actions (hit, stand, double, split, surrender)
+- Game resolution and payout calculation
+
+See [tests/test_game_logic.c](tests/test_game_logic.c#L143-L332) for commented-out tests ready to uncomment.
 
 ### Build Everything
 ```bash
@@ -103,10 +113,13 @@ This project follows **Test-Driven Development (TDD)**:
 - [x] Hand initialization and dynamic arrays
 - [x] Hand value with ace handling
 - [x] Soft/hard hand detection
-- [ ] Blackjack detection
-- [ ] Split and double detection
-- [ ] Game rules configuration
-- [ ] Dealer decision logic
+- [x] Blackjack detection
+- [x] Split and double detection
+- [x] Game rules configuration
+- [x] Dealer decision logic (hit/stand)
+- [ ] Game state management
+- [ ] Player action handling
+- [ ] Payout calculation
 - [ ] Full game simulation
 - [ ] Basic strategy lookup
 - [ ] Monte Carlo simulation engine

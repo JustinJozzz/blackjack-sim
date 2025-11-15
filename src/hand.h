@@ -14,4 +14,10 @@ int hand_get_value(Hand* hand);
 
 bool hand_is_soft(Hand* hand);
 
+bool hand_is_blackjack(Hand* hand);
+
+bool hand_can_split(Hand* hand);
+
+bool hand_can_double(Hand* hand);
+
 void hand_destroy(Hand* hand);

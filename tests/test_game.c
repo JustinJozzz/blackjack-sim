@@ -61,12 +61,6 @@ TEST(card_dealing) {
     deck_destroy(&deck);
 }
 
-// Add more tests here as you implement features:
-// TEST(hand_value_calculation) { ... }
-// TEST(blackjack_detection) { ... }
-// TEST(dealer_logic) { ... }
-// TEST(basic_strategy) { ... }
-
 int main(void) {
     printf("Running Blackjack Simulator Tests\n");
     printf("==================================\n\n");
@@ -75,10 +69,6 @@ int main(void) {
     run_test_deck_initialization();
     run_test_deck_shuffle();
     run_test_card_dealing();
-    
-    // Add more test runs here as you create them
-    // run_test_hand_value_calculation();
-    // run_test_blackjack_detection();
     
     printf("\n==================================\n");
     printf("Tests passed: %d/%d\n", tests_passed, tests_run);

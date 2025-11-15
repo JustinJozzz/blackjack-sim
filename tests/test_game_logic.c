@@ -2,11 +2,8 @@
 #include <assert.h>
 #include <stdbool.h>
 // Uncomment these as you create the headers
-// #include "../src/rules.h"
-// #include "../src/dealer.h"
+#include "../src/dealer.h"
 // #include "../src/game.h"
-// #include "../src/hand.h"
-// #include "../src/card.h"
 
 // Simple test framework
 int tests_run = 0;
@@ -24,99 +21,69 @@ int tests_passed = 0;
     void test_##name()
 
 // ============================================================================
-// GAME RULES TESTS
-// ============================================================================
-// Implement rules.h with:
-// typedef struct {
-//     bool dealer_hits_soft_17;
-//     bool double_after_split;
-//     bool surrender_allowed;
-//     int max_splits;
-//     double blackjack_payout;  // 1.5 for 3:2, 1.2 for 6:5
-//     bool resplit_aces;
-//     int num_decks;
-// } GameRules;
-//
-// void rules_init_standard(GameRules* rules) - Standard Vegas rules
-// void rules_init_custom(GameRules* rules, ...) - Custom configuration
-
-// TEST(standard_rules_initialization) {
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     assert(rules.dealer_hits_soft_17 == false);  // Dealer stands on soft 17
-//     assert(rules.double_after_split == true);
-//     assert(rules.surrender_allowed == true);
-//     assert(rules.max_splits == 3);
-//     assert(rules.blackjack_payout == 1.5);  // 3:2
-//     assert(rules.resplit_aces == false);
-//     assert(rules.num_decks == 6);
-// }
-
-// ============================================================================
 // DEALER LOGIC TESTS
 // ============================================================================
 // Implement dealer.h with:
 // - bool dealer_should_hit(Hand* dealer_hand, GameRules* rules)
 // - void dealer_play(Hand* dealer_hand, Deck* deck, GameRules* rules)
 
-// TEST(dealer_hits_on_16) {
-//     Hand hand;
-//     hand_init(&hand);
-//     hand_add_card(&hand, 9);   // 10
-//     hand_add_card(&hand, 5);   // 6
-//
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     assert(dealer_should_hit(&hand, &rules) == true);
-//
-//     hand_destroy(&hand);
-// }
+TEST(dealer_hits_on_16) {
+    Hand hand;
+    hand_init(&hand);
+    hand_add_card(&hand, 9);   // 10
+    hand_add_card(&hand, 5);   // 6
 
-// TEST(dealer_stands_on_17) {
-//     Hand hand;
-//     hand_init(&hand);
-//     hand_add_card(&hand, 9);   // 10
-//     hand_add_card(&hand, 6);   // 7
-//
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     assert(dealer_should_hit(&hand, &rules) == false);
-//
-//     hand_destroy(&hand);
-// }
+    Rules rules;
+    init_rules(&rules);
 
-// TEST(dealer_stands_on_soft_17_standard) {
-//     Hand hand;
-//     hand_init(&hand);
-//     hand_add_card(&hand, 0);   // Ace
-//     hand_add_card(&hand, 5);   // 6
-//
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//     rules.dealer_hits_soft_17 = false;
-//
-//     assert(dealer_should_hit(&hand, &rules) == false);
-//
-//     hand_destroy(&hand);
-// }
+    assert(dealer_should_hit(&hand, &rules) == true);
 
-// TEST(dealer_hits_on_soft_17_h17) {
-//     Hand hand;
-//     hand_init(&hand);
-//     hand_add_card(&hand, 0);   // Ace
-//     hand_add_card(&hand, 5);   // 6
-//
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//     rules.dealer_hits_soft_17 = true;
-//
-//     assert(dealer_should_hit(&hand, &rules) == true);
-//
-//     hand_destroy(&hand);
-// }
+    hand_destroy(&hand);
+}
+
+TEST(dealer_stands_on_17) {
+    Hand hand;
+    hand_init(&hand);
+    hand_add_card(&hand, 9);   // 10
+    hand_add_card(&hand, 6);   // 7
+
+    Rules rules;
+    init_rules(&rules);
+
+    assert(dealer_should_hit(&hand, &rules) == false);
+
+    hand_destroy(&hand);
+}
+
+TEST(dealer_stands_on_soft_17_standard) {
+    Hand hand;
+    hand_init(&hand);
+    hand_add_card(&hand, 0);   // Ace
+    hand_add_card(&hand, 5);   // 6
+
+    Rules rules;
+    init_rules(&rules);
+    rules.dealer_hits_soft_17 = false;
+
+    assert(dealer_should_hit(&hand, &rules) == false);
+
+    hand_destroy(&hand);
+}
+
+TEST(dealer_hits_on_soft_17_h17) {
+    Hand hand;
+    hand_init(&hand);
+    hand_add_card(&hand, 0);   // Ace
+    hand_add_card(&hand, 5);   // 6
+
+    Rules rules;
+    init_rules(&rules);
+    rules.dealer_hits_soft_17 = true;
+
+    assert(dealer_should_hit(&hand, &rules) == true);
+
+    hand_destroy(&hand);
+}
 
 // ============================================================================
 // GAME STATE TESTS
@@ -142,7 +109,7 @@ int tests_passed = 0;
 
 // TEST(game_initialization) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -156,7 +123,7 @@ int tests_passed = 0;
 
 // TEST(game_initial_deal) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -176,7 +143,7 @@ int tests_passed = 0;
 
 // TEST(game_player_hits) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -192,7 +159,7 @@ int tests_passed = 0;
 
 // TEST(game_player_stands) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -213,7 +180,7 @@ int tests_passed = 0;
 
 // TEST(game_player_busts) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -237,7 +204,7 @@ int tests_passed = 0;
 
 // TEST(game_blackjack_payout) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -261,7 +228,7 @@ int tests_passed = 0;
 
 // TEST(game_player_wins) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -285,7 +252,7 @@ int tests_passed = 0;
 
 // TEST(game_push) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -307,7 +274,7 @@ int tests_passed = 0;
 
 // TEST(game_dealer_busts) {
 //     GameRules rules;
-//     rules_init_standard(&rules);
+//     init_rules_standard(&rules);
 //
 //     GameState game;
 //     game_init(&game, &rules, 10.0);
@@ -337,14 +304,11 @@ int main(void) {
 
     // Uncomment these as you implement the functions
 
-    // Rules tests
-    // run_test_standard_rules_initialization();
-
     // Dealer tests
-    // run_test_dealer_hits_on_16();
-    // run_test_dealer_stands_on_17();
-    // run_test_dealer_stands_on_soft_17_standard();
-    // run_test_dealer_hits_on_soft_17_h17();
+    run_test_dealer_hits_on_16();
+    run_test_dealer_stands_on_17();
+    run_test_dealer_stands_on_soft_17_standard();
+    run_test_dealer_hits_on_soft_17_h17();
 
     // Game state tests
     // run_test_game_initialization();
