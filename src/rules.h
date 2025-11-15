@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdbool.h>
 
 typedef struct {
@@ -32,4 +34,4 @@ typedef struct {
     bool six_card_charlie;
 } Rules;
 
-void init_rules(Rules* rules);
+void rules_init(Rules* rules);

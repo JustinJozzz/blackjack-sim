@@ -33,11 +33,11 @@ int tests_passed = 0;
 //     int num_decks;
 // } Rules;
 //
-// void init_rules(Rules* rules) - Standard Vegas rules
+// void rules_init(Rules* rules) - Standard Vegas rules
 
 TEST(standard_rules_initialization) {
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // Standard 6-deck Vegas rules: S17, DAS, LSR
     assert(rules.dealer_hits_soft_17 == false);  // Dealer stands on soft 17
@@ -51,7 +51,7 @@ TEST(standard_rules_initialization) {
 
 TEST(custom_rules_h17) {
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // Modify to H17 (dealer hits soft 17 - worse for player)
     rules.dealer_hits_soft_17 = true;
@@ -62,7 +62,7 @@ TEST(custom_rules_h17) {
 
 TEST(custom_rules_6_5_blackjack) {
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // Modify to 6:5 blackjack (worse for player)
     rules.blackjack_payout = 1.2;  // 6:5 instead of 3:2
@@ -73,7 +73,7 @@ TEST(custom_rules_6_5_blackjack) {
 
 TEST(custom_rules_single_deck) {
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // Single deck game
     rules.num_decks = 1;
@@ -84,7 +84,7 @@ TEST(custom_rules_single_deck) {
 
 TEST(custom_rules_no_surrender) {
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // No surrender allowed
     rules.late_surrender_allowed = false;
@@ -95,7 +95,7 @@ TEST(custom_rules_no_surrender) {
 
 TEST(custom_rules_no_das) {
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // No double after split
     rules.double_after_split = false;
@@ -105,7 +105,7 @@ TEST(custom_rules_no_das) {
 
 TEST(custom_rules_can_resplit_aces) {
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // Allow resplitting aces (rare, favorable to player)
     rules.can_resplit_aces = true;
@@ -115,7 +115,7 @@ TEST(custom_rules_can_resplit_aces) {
 
 TEST(custom_rules_max_splits) {
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // Some casinos allow unlimited splits
     rules.max_splits = 10;  // Effectively unlimited
@@ -131,7 +131,7 @@ TEST(rules_european_no_hole_card) {
     // European rules: dealer doesn't take hole card until player done
     // This would require an additional flag in the future
     Rules rules;
-    init_rules(&rules);
+    rules_init(&rules);
     
     // For now, just test we can create European-style rules
     rules.num_decks = 6;
@@ -146,8 +146,8 @@ TEST(rules_european_no_hole_card) {
 TEST(rules_comparison) {
     Rules rules1, rules2;
     
-    init_rules(&rules1);
-    init_rules(&rules2);
+    rules_init(&rules1);
+    rules_init(&rules2);
     
     // Both should have identical settings
     assert(rules1.dealer_hits_soft_17 == rules2.dealer_hits_soft_17);

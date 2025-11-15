@@ -27,13 +27,19 @@ This project simulates thousands of blackjack hands to determine the mathematica
 - Standard Vegas rules (S17, DAS, LSR, 3:2, 6-deck)
 - Configurable rule variations (H17, 6:5, single deck, etc.)
 
-🚧 **Phase 2: Dealer Logic** (4/4 tests passing)
+✅ **Phase 2: Dealer Logic** (4/4 tests passing)
 - Dealer hit/stand decision logic
 - Soft 17 handling
 
+🚧 **Phase 3: Game State Management** (In Progress)
+- GameState structure with player/dealer hands
+- Game initialization and cleanup
+- Initial deal implementation
+- Split hands support structure
+
 ⏳ **Next Steps: See IMPLEMENTATION_GUIDE.md**
-- Game state management
 - Player actions (hit, stand, double, split, surrender)
+- Dealer play logic
 - Payout calculations
 - Basic strategy
 - Simulation engine
@@ -47,8 +53,8 @@ blackjack-sim/
 │   ├── card.c/h          ✅ Card utilities (4/4 tests passing)
 │   ├── hand.c/h          ✅ Hand management (14/14 tests passing)
 │   ├── rules.c/h         ✅ Game rules (10/10 tests passing)
-│   ├── dealer.c/h        🚧 Dealer logic (4/4 tests passing)
-│   ├── game.c/h          ⏳ Core game logic (to implement)
+│   ├── dealer.c/h        ✅ Dealer logic (4/4 tests passing)
+│   ├── game.c/h          🚧 Core game logic (in progress)
 │   ├── strategy.c/h      ⏳ Basic strategy (to implement)
 │   └── simulation.c/h    ⏳ Monte Carlo engine (to implement)
 ├── tests/
@@ -117,8 +123,9 @@ This project follows **Test-Driven Development (TDD)**:
 - [x] Split and double detection
 - [x] Game rules configuration
 - [x] Dealer decision logic (hit/stand)
-- [ ] Game state management
+- [x] Game state management (basic structure)
 - [ ] Player action handling
+- [ ] Dealer play logic
 - [ ] Payout calculation
 - [ ] Full game simulation
 - [ ] Basic strategy lookup

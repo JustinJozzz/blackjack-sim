@@ -1,7 +1,7 @@
 #include "rules.h"
 
 
-void init_rules(Rules* rules) {
+void rules_init(Rules* rules) {
     // Dealer rules
     rules->dealer_hits_soft_17 = false;        // S17 (dealer stands)
     rules->dealer_peeks_blackjack = true;      // US rules
