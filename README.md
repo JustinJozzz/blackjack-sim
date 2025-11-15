@@ -31,18 +31,25 @@ This project simulates thousands of blackjack hands to determine the mathematica
 - Dealer hit/stand decision logic
 - Soft 17 handling
 
-🚧 **Phase 3: Game State Management** (In Progress)
+✅ **Phase 3: Game State Management** (14/14 tests passing)
 - GameState structure with player/dealer hands
 - Game initialization and cleanup
 - Initial deal implementation
-- Split hands support structure
+- Player actions (hit, stand)
+- Game resolution and payout calculations
+- Blackjack detection for correct payouts
+- Win/loss/push scenarios
+- Dealer bust handling
 
-⏳ **Next Steps: See IMPLEMENTATION_GUIDE.md**
-- Player actions (hit, stand, double, split, surrender)
-- Dealer play logic
-- Payout calculations
-- Basic strategy
-- Simulation engine
+⏳ **Phase 4: Advanced Game Actions** (Next)
+- Double down implementation
+- Split hand support
+- Surrender implementation
+- Dealer play automation
+
+⏳ **Phase 5: Strategy & Simulation**
+- Basic strategy lookup tables
+- Monte Carlo simulation engine
 
 ## Project Structure
 
@@ -54,14 +61,14 @@ blackjack-sim/
 │   ├── hand.c/h          ✅ Hand management (14/14 tests passing)
 │   ├── rules.c/h         ✅ Game rules (10/10 tests passing)
 │   ├── dealer.c/h        ✅ Dealer logic (4/4 tests passing)
-│   ├── game.c/h          🚧 Core game logic (in progress)
+│   ├── game.c/h          ✅ Core game logic (14/14 tests passing)
 │   ├── strategy.c/h      ⏳ Basic strategy (to implement)
 │   └── simulation.c/h    ⏳ Monte Carlo engine (to implement)
 ├── tests/
 │   ├── test_game.c       ✅ Deck tests (3/3 passing)
 │   ├── test_hand.c       ✅ Card & hand tests (14/14 passing)
 │   ├── test_rules.c      ✅ Rules tests (10/10 passing)
-│   ├── test_game_logic.c 🚧 Dealer & game tests (4 passing, ready to uncomment more)
+│   ├── test_game_logic.c ✅ Dealer & game tests (14/14 passing)
 │   └── test_strategy.c   ✅ Strategy tests (ready to uncomment)
 ├── .vscode/              🔧 VS Code debug configurations
 ├── ARCHITECTURE.md       📖 System design overview
@@ -81,18 +88,18 @@ make test
 - ✅ Card utilities: 4/4 tests passing
 - ✅ Hand management: 14/14 tests passing
 - ✅ Game rules: 10/10 tests passing
-- ✅ Dealer logic: 4/4 tests passing
+- ✅ Dealer & game logic: 14/14 tests passing
 
-**Total: 35/35 tests passing**
+**Total: 41/41 tests passing**
 
 ### Next Steps
-Implement game state management in [src/game.c](src/game.c) and [src/game.h](src/game.h):
-- Game initialization and cleanup
-- Initial deal (2 cards to player, 2 to dealer)
-- Player actions (hit, stand, double, split, surrender)
-- Game resolution and payout calculation
+Implement advanced game actions in [src/game.c](src/game.c):
+- Double down action (increase bet, take one card, end turn)
+- Split hand support (play multiple hands from pairs)
+- Surrender action (forfeit half bet)
+- Dealer play automation (dealer draws until 17+)
 
-See [tests/test_game_logic.c](tests/test_game_logic.c#L143-L332) for commented-out tests ready to uncomment.
+See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed implementation steps.
 
 ### Build Everything
 ```bash
@@ -123,10 +130,13 @@ This project follows **Test-Driven Development (TDD)**:
 - [x] Split and double detection
 - [x] Game rules configuration
 - [x] Dealer decision logic (hit/stand)
-- [x] Game state management (basic structure)
-- [ ] Player action handling
-- [ ] Dealer play logic
-- [ ] Payout calculation
+- [x] Game state management
+- [x] Player action handling (hit, stand)
+- [x] Game resolution and payout calculation
+- [ ] Double down action
+- [ ] Split hand support
+- [ ] Surrender action
+- [ ] Dealer play automation
 - [ ] Full game simulation
 - [ ] Basic strategy lookup
 - [ ] Monte Carlo simulation engine
