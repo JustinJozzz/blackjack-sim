@@ -41,15 +41,24 @@ This project simulates thousands of blackjack hands to determine the mathematica
 - Win/loss/push scenarios
 - Dealer bust handling
 
-⏳ **Phase 4: Advanced Game Actions** (Next)
+✅ **Phase 4: Basic Strategy Lookup** (6/6 tests passing)
+- Complete basic strategy tables (318 entries)
+- Hard totals strategy (player 8-16 vs dealer 2-11)
+- Soft totals strategy (A-2 through A-9 vs dealer 2-11)
+- Pair splitting strategy (all pairs vs dealer 2-11)
+- Late surrender strategy (14-16 vs dealer 9-A)
+- Strategy lookup with rule compliance (DAS, surrender, doubling)
+
+⏳ **Phase 5: Advanced Game Actions** (Next)
 - Double down implementation
 - Split hand support
 - Surrender implementation
 - Dealer play automation
 
-⏳ **Phase 5: Strategy & Simulation**
-- Basic strategy lookup tables
-- Monte Carlo simulation engine
+⏳ **Phase 6: Monte Carlo Simulation**
+- Simulation engine
+- Expected value calculations
+- Strategy validation
 
 ## Project Structure
 
@@ -62,14 +71,14 @@ blackjack-sim/
 │   ├── rules.c/h         ✅ Game rules (10/10 tests passing)
 │   ├── dealer.c/h        ✅ Dealer logic (4/4 tests passing)
 │   ├── game.c/h          ✅ Core game logic (14/14 tests passing)
-│   ├── strategy.c/h      ⏳ Basic strategy (to implement)
+│   ├── strategy.c/h      ✅ Basic strategy lookup (6/6 tests passing)
 │   └── simulation.c/h    ⏳ Monte Carlo engine (to implement)
 ├── tests/
 │   ├── test_game.c       ✅ Deck tests (3/3 passing)
 │   ├── test_hand.c       ✅ Card & hand tests (14/14 passing)
 │   ├── test_rules.c      ✅ Rules tests (10/10 passing)
 │   ├── test_game_logic.c ✅ Dealer & game tests (14/14 passing)
-│   └── test_strategy.c   ✅ Strategy tests (ready to uncomment)
+│   └── test_strategy.c   ✅ Strategy tests (6/6 passing)
 ├── .vscode/              🔧 VS Code debug configurations
 ├── ARCHITECTURE.md       📖 System design overview
 ├── IMPLEMENTATION_GUIDE.md 📖 Step-by-step implementation guide
@@ -89,15 +98,16 @@ make test
 - ✅ Hand management: 14/14 tests passing
 - ✅ Game rules: 10/10 tests passing
 - ✅ Dealer & game logic: 14/14 tests passing
+- ✅ Basic strategy: 6/6 tests passing
 
-**Total: 41/41 tests passing**
+**Total: 47/47 tests passing**
 
 ### Next Steps
-Implement advanced game actions in [src/game.c](src/game.c):
-- Double down action (increase bet, take one card, end turn)
-- Split hand support (play multiple hands from pairs)
-- Surrender action (forfeit half bet)
-- Dealer play automation (dealer draws until 17+)
+Implement advanced game features:
+- **Game Actions**: Double down, split hands, surrender in [src/game.c](src/game.c)
+- **Dealer Automation**: Complete dealer play logic
+- **Simulation Engine**: Monte Carlo simulation in [src/simulation.c](src/simulation.c)
+- **Strategy Validation**: Verify basic strategy expected values
 
 See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed implementation steps.
 
@@ -133,12 +143,13 @@ This project follows **Test-Driven Development (TDD)**:
 - [x] Game state management
 - [x] Player action handling (hit, stand)
 - [x] Game resolution and payout calculation
+- [x] Basic strategy lookup tables
+- [x] Strategy decision engine
 - [ ] Double down action
 - [ ] Split hand support
 - [ ] Surrender action
 - [ ] Dealer play automation
 - [ ] Full game simulation
-- [ ] Basic strategy lookup
 - [ ] Monte Carlo simulation engine
 
 ### Advanced Features

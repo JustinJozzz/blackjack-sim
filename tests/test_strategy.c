@@ -3,10 +3,10 @@
 #include <stdbool.h>
 #include <math.h>
 // Uncomment these as you create the headers
-// #include "../src/strategy.h"
+#include "../src/strategy.h"
 // #include "../src/simulation.h"
-// #include "../src/game.h"
-// #include "../src/hand.h"
+#include "../src/game.h"
+#include "../src/hand.h"
 
 // Simple test framework
 int tests_run = 0;
@@ -27,120 +27,138 @@ int tests_passed = 0;
 // BASIC STRATEGY TESTS
 // ============================================================================
 // Implement strategy.h with:
-// PlayerAction get_basic_strategy_action(Hand* player, int dealer_upcard, GameRules* rules, bool can_split, bool can_double)
+// PlayerAction get_basic_strategy_action(Hand* player, int dealer_upcard, Rules* rules, bool can_split, bool can_double)
 //
 // Basic strategy logic based on mathematical optimal play for standard rules
 
-// TEST(strategy_player_hard_16_vs_dealer_10) {
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     Hand player;
-//     hand_init(&player);
-//     hand_add_card(&player, 9);  // 10
-//     hand_add_card(&player, 5);  // 6 -> Hard 16
-//
-//     // Against dealer 10, basic strategy says HIT (without surrender)
-//     // With surrender allowed, basic strategy says SURRENDER
-//     int dealer_upcard = 9;  // 10-value card
-//
-//     if (rules.surrender_allowed) {
-//         PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, false, false);
-//         assert(action == SURRENDER);
-//     }
-//
-//     hand_destroy(&player);
-// }
+TEST(strategy_player_hard_16_vs_dealer_10) {
+    Rules rules;
+    rules_init(&rules);
 
-// TEST(strategy_player_soft_18_vs_dealer_9) {
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     Hand player;
-//     hand_init(&player);
-//     hand_add_card(&player, 0);  // Ace
-//     hand_add_card(&player, 6);  // 7 -> Soft 18
-//
-//     int dealer_upcard = 8;  // 9-value card
-//
-//     // Soft 18 vs 9: basic strategy says HIT
-//     PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, false, true);
-//     assert(action == HIT);
-//
-//     hand_destroy(&player);
-// }
+    BasicStrategy strategy;
+    basic_strategy_init(&strategy);
 
-// TEST(strategy_player_11_vs_dealer_any) {
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     Hand player;
-//     hand_init(&player);
-//     hand_add_card(&player, 5);  // 6
-//     hand_add_card(&player, 4);  // 5 -> 11
-//
-//     // 11 vs any dealer card: basic strategy says DOUBLE (if allowed)
-//     for (int dealer_upcard = 0; dealer_upcard < 13; dealer_upcard++) {
-//         PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, false, true);
-//         assert(action == DOUBLE);
-//     }
-//
-//     hand_destroy(&player);
-// }
+    Hand player;
+    hand_init(&player);
+    hand_add_card(&player, 9);  // 10
+    hand_add_card(&player, 5);  // 6 -> Hard 16
 
-// TEST(strategy_player_pair_8s_vs_any) {
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     Hand player;
-//     hand_init(&player);
-//     hand_add_card(&player, 7);  // 8
-//     hand_add_card(&player, 7);  // 8 -> Pair of 8s
-//
-//     // Pair of 8s vs any dealer card: always SPLIT
-//     for (int dealer_upcard = 0; dealer_upcard < 13; dealer_upcard++) {
-//         PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, true, true);
-//         assert(action == SPLIT);
-//     }
-//
-//     hand_destroy(&player);
-// }
+    // Against dealer 10, basic strategy says HIT (without surrender)
+    // With surrender allowed, basic strategy says SURRENDER
+    int dealer_upcard = 9;  // 10-value card
 
-// TEST(strategy_player_pair_10s_vs_any) {
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     Hand player;
-//     hand_init(&player);
-//     hand_add_card(&player, 9);  // 10
-//     hand_add_card(&player, 9);  // 10 -> Pair of 10s (hard 20)
-//
-//     // Pair of 10s vs any dealer card: always STAND (never split)
-//     for (int dealer_upcard = 0; dealer_upcard < 13; dealer_upcard++) {
-//         PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, true, true);
-//         assert(action == STAND);
-//     }
-//
-//     hand_destroy(&player);
-// }
+    if (rules.late_surrender_allowed) {
+        PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, &strategy, false, false);
+        assert(action == SURRENDER);
+    }
 
-// TEST(strategy_player_hard_17_vs_any) {
-//     GameRules rules;
-//     rules_init_standard(&rules);
-//
-//     Hand player;
-//     hand_init(&player);
-//     hand_add_card(&player, 9);  // 10
-//     hand_add_card(&player, 6);  // 7 -> Hard 17
-//
-//     // Hard 17 or higher: always STAND
-//     for (int dealer_upcard = 0; dealer_upcard < 13; dealer_upcard++) {
-//         PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, false, false);
-//         assert(action == STAND);
-//     }
-//
-//     hand_destroy(&player);
-// }
+    hand_destroy(&player);
+}
+
+TEST(strategy_player_soft_18_vs_dealer_9) {
+    Rules rules;
+    rules_init(&rules);
+
+    BasicStrategy strategy;
+    basic_strategy_init(&strategy);
+
+    Hand player;
+    hand_init(&player);
+    hand_add_card(&player, 0);  // Ace
+    hand_add_card(&player, 6);  // 7 -> Soft 18
+
+    int dealer_upcard = 8;  // 9-value card
+
+    // Soft 18 vs 9: basic strategy says HIT
+    PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, &strategy, false, true);
+    assert(action == HIT);
+
+    hand_destroy(&player);
+}
+
+TEST(strategy_player_11_vs_dealer_any) {
+    Rules rules;
+    rules_init(&rules);
+
+    BasicStrategy strategy;
+    basic_strategy_init(&strategy);
+
+    Hand player;
+    hand_init(&player);
+    hand_add_card(&player, 5);  // 6
+    hand_add_card(&player, 4);  // 5 -> 11
+
+    // 11 vs any dealer card: basic strategy says DOUBLE (if allowed)
+    for (int dealer_upcard = 0; dealer_upcard < 13; dealer_upcard++) {
+        PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, &strategy, false, true);
+        assert(action == DOUBLE);
+    }
+
+    hand_destroy(&player);
+}
+
+TEST(strategy_player_pair_8s_vs_any) {
+    Rules rules;
+    rules_init(&rules);
+
+    BasicStrategy strategy;
+    basic_strategy_init(&strategy);
+
+    Hand player;
+    hand_init(&player);
+    hand_add_card(&player, 7);  // 8
+    hand_add_card(&player, 7);  // 8 -> Pair of 8s
+
+    // Pair of 8s vs any dealer card: always SPLIT
+    for (int dealer_upcard = 0; dealer_upcard < 13; dealer_upcard++) {
+        PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, &strategy, true, true);
+        assert(action == SPLIT);
+    }
+
+    hand_destroy(&player);
+}
+
+TEST(strategy_player_pair_10s_vs_any) {
+    Rules rules;
+    rules_init(&rules);
+
+    BasicStrategy strategy;
+    basic_strategy_init(&strategy);
+
+    Hand player;
+    hand_init(&player);
+    hand_add_card(&player, 9);  // 10
+    hand_add_card(&player, 9);  // 10 -> Pair of 10s (hard 20)
+
+    // Pair of 10s vs any dealer card: always STAND (never split)
+    for (int dealer_upcard = 0; dealer_upcard < 13; dealer_upcard++) {
+        PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, &strategy, true, true);
+        assert(action == STAND);
+    }
+
+    hand_destroy(&player);
+}
+
+TEST(strategy_player_hard_17_vs_any) {
+    Rules rules;
+    rules_init(&rules);
+
+    BasicStrategy strategy;
+    basic_strategy_init(&strategy);
+
+    Hand player;
+    hand_init(&player);
+    hand_add_card(&player, 9);  // 10
+    hand_add_card(&player, 6);  // 7 -> Hard 17
+
+    // Hard 17 or higher: always STAND
+    for (int dealer_upcard = 0; dealer_upcard < 13; dealer_upcard++) {
+        PlayerAction action = get_basic_strategy_action(&player, dealer_upcard, &rules, &strategy, false, false);
+        assert(action == STAND);
+    }
+
+    hand_destroy(&player);
+}
 
 // ============================================================================
 // SIMULATION TESTS
@@ -148,7 +166,7 @@ int tests_passed = 0;
 // Implement simulation.h with:
 // typedef struct {
 //     int num_hands;
-//     GameRules rules;
+//     Rules rules;
 //     bool use_basic_strategy;
 // } SimulationConfig;
 //
@@ -168,7 +186,7 @@ int tests_passed = 0;
 
 // TEST(simulation_initialization) {
 //     SimulationConfig config;
-//     rules_init_standard(&config.rules);
+//     rules_init(&config.rules);
 //     config.num_hands = 1000;
 //     config.use_basic_strategy = true;
 //
@@ -184,7 +202,7 @@ int tests_passed = 0;
 
 // TEST(simulation_basic_strategy_ev) {
 //     SimulationConfig config;
-//     rules_init_standard(&config.rules);
+//     rules_init(&config.rules);
 //     config.num_hands = 100000;  // Large sample for accuracy
 //     config.use_basic_strategy = true;
 //
@@ -203,7 +221,7 @@ int tests_passed = 0;
 
 // TEST(simulation_win_rate) {
 //     SimulationConfig config;
-//     rules_init_standard(&config.rules);
+//     rules_init(&config.rules);
 //     config.num_hands = 10000;
 //     config.use_basic_strategy = true;
 //
@@ -225,7 +243,7 @@ int tests_passed = 0;
 
 // TEST(simulation_blackjack_frequency) {
 //     SimulationConfig config;
-//     rules_init_standard(&config.rules);
+//     rules_init(&config.rules);
 //     config.num_hands = 10000;
 //     config.use_basic_strategy = true;
 //
@@ -243,7 +261,7 @@ int tests_passed = 0;
 // TEST(simulation_different_rules_affect_ev) {
 //     // Test 1: Standard 3:2 blackjack payout
 //     SimulationConfig config1;
-//     rules_init_standard(&config1.rules);
+//     rules_init(&config1.rules);
 //     config1.rules.blackjack_payout = 1.5;  // 3:2
 //     config1.num_hands = 50000;
 //     config1.use_basic_strategy = true;
@@ -254,7 +272,7 @@ int tests_passed = 0;
 //
 //     // Test 2: 6:5 blackjack payout (worse for player)
 //     SimulationConfig config2;
-//     rules_init_standard(&config2.rules);
+//     rules_init(&config2.rules);
 //     config2.rules.blackjack_payout = 1.2;  // 6:5
 //     config2.num_hands = 50000;
 //     config2.use_basic_strategy = true;
@@ -277,8 +295,8 @@ int tests_passed = 0;
 // TEST(calculate_strategy_for_hard_12) {
 //     // For a given situation (hard 12 vs dealer 4),
 //     // run simulations for HIT vs STAND and determine which is better
-//     GameRules rules;
-//     rules_init_standard(&rules);
+//     Rules rules;
+//     rules_init(&rules);
 //
 //     // Run N simulations for HIT
 //     double ev_hit = calculate_situation_ev(12, false, false, 3, HIT, &rules, 10000);
@@ -299,12 +317,12 @@ int main(void) {
     // Uncomment these as you implement the functions
 
     // Basic strategy tests
-    // run_test_strategy_player_hard_16_vs_dealer_10();
-    // run_test_strategy_player_soft_18_vs_dealer_9();
-    // run_test_strategy_player_11_vs_dealer_any();
-    // run_test_strategy_player_pair_8s_vs_any();
-    // run_test_strategy_player_pair_10s_vs_any();
-    // run_test_strategy_player_hard_17_vs_any();
+    run_test_strategy_player_hard_16_vs_dealer_10();
+    run_test_strategy_player_soft_18_vs_dealer_9();
+    run_test_strategy_player_11_vs_dealer_any();
+    run_test_strategy_player_pair_8s_vs_any();
+    run_test_strategy_player_pair_10s_vs_any();
+    run_test_strategy_player_hard_17_vs_any();
 
     // Simulation tests
     // run_test_simulation_initialization();
