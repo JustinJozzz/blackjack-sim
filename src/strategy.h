@@ -1,3 +1,5 @@
+#pragma once
+
 #include "hand.h"
 #include "rules.h"
 #include "game.h"

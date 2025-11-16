@@ -4,7 +4,7 @@
 #include <math.h>
 // Uncomment these as you create the headers
 #include "../src/strategy.h"
-// #include "../src/simulation.h"
+#include "../src/simulation.h"
 #include "../src/game.h"
 #include "../src/hand.h"
 
@@ -184,21 +184,22 @@ TEST(strategy_player_hard_17_vs_any) {
 // void simulation_run(SimulationConfig* config, SimulationResults* results)
 // double simulation_get_ev(SimulationResults* results) - Calculate expected value
 
-// TEST(simulation_initialization) {
-//     SimulationConfig config;
-//     rules_init(&config.rules);
-//     config.num_hands = 1000;
-//     config.use_basic_strategy = true;
-//
-//     SimulationResults results = {0};
-//
-//     simulation_run(&config, &results);
-//
-//     assert(results.hands_played == 1000);
-//     assert(results.hands_won > 0);
-//     assert(results.hands_lost > 0);
-//     assert(results.total_bet == 1000.0);  // Assuming $1 per hand
-// }
+TEST(simulation_initialization) {
+    SimulationConfig config;
+    rules_init(&config.rules);
+    basic_strategy_init(&config.strategy);
+    config.num_hands = 1000;
+    config.bet_per_hand = 1.0;
+
+    SimulationResults results = {0};
+
+    simulation_run(&config, &results);
+
+    assert(results.hands_played == 1000);
+    assert(results.hands_won > 0);
+    assert(results.hands_lost > 0);
+    assert(results.total_bet == 1000.0);  // Assuming $1 per hand
+}
 
 // TEST(simulation_basic_strategy_ev) {
 //     SimulationConfig config;
@@ -325,7 +326,7 @@ int main(void) {
     run_test_strategy_player_hard_17_vs_any();
 
     // Simulation tests
-    // run_test_simulation_initialization();
+    run_test_simulation_initialization();
     // run_test_simulation_basic_strategy_ev();
     // run_test_simulation_win_rate();
     // run_test_simulation_blackjack_frequency();

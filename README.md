@@ -49,14 +49,18 @@ This project simulates thousands of blackjack hands to determine the mathematica
 - Late surrender strategy (14-16 vs dealer 9-A)
 - Strategy lookup with rule compliance (DAS, surrender, doubling)
 
-⏳ **Phase 5: Advanced Game Actions** (Next)
+⏳ **Phase 5: Monte Carlo Simulation** (1/1 tests passing)
+- Basic simulation engine
+- Game state initialization and cleanup
+- Player and dealer play automation
+- Win/loss/push tracking
+- Bet and payout tracking
+- House edge calculation
+
+⏳ **Phase 6: Advanced Game Actions** (Next)
 - Double down implementation
 - Split hand support
 - Surrender implementation
-- Dealer play automation
-
-⏳ **Phase 6: Monte Carlo Simulation**
-- Simulation engine
 - Expected value calculations
 - Strategy validation
 
@@ -72,13 +76,13 @@ blackjack-sim/
 │   ├── dealer.c/h        ✅ Dealer logic (4/4 tests passing)
 │   ├── game.c/h          ✅ Core game logic (14/14 tests passing)
 │   ├── strategy.c/h      ✅ Basic strategy lookup (6/6 tests passing)
-│   └── simulation.c/h    ⏳ Monte Carlo engine (to implement)
+│   └── simulation.c/h    ✅ Monte Carlo engine (1/1 tests passing)
 ├── tests/
 │   ├── test_game.c       ✅ Deck tests (3/3 passing)
 │   ├── test_hand.c       ✅ Card & hand tests (14/14 passing)
 │   ├── test_rules.c      ✅ Rules tests (10/10 passing)
 │   ├── test_game_logic.c ✅ Dealer & game tests (14/14 passing)
-│   └── test_strategy.c   ✅ Strategy tests (6/6 passing)
+│   └── test_strategy.c   ✅ Strategy & simulation tests (7/7 passing)
 ├── .vscode/              🔧 VS Code debug configurations
 ├── ARCHITECTURE.md       📖 System design overview
 ├── IMPLEMENTATION_GUIDE.md 📖 Step-by-step implementation guide
@@ -99,15 +103,15 @@ make test
 - ✅ Game rules: 10/10 tests passing
 - ✅ Dealer & game logic: 14/14 tests passing
 - ✅ Basic strategy: 6/6 tests passing
+- ✅ Simulation engine: 1/1 tests passing
 
-**Total: 47/47 tests passing**
+**Total: 48/48 tests passing**
 
 ### Next Steps
-Implement advanced game features:
+Continue simulation development and advanced features:
+- **Advanced Simulation Tests**: Expected value, win rate validation, rule variations
 - **Game Actions**: Double down, split hands, surrender in [src/game.c](src/game.c)
-- **Dealer Automation**: Complete dealer play logic
-- **Simulation Engine**: Monte Carlo simulation in [src/simulation.c](src/simulation.c)
-- **Strategy Validation**: Verify basic strategy expected values
+- **Strategy Validation**: Verify basic strategy house edge (~0.5%)
 
 See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed implementation steps.
 
@@ -145,12 +149,12 @@ This project follows **Test-Driven Development (TDD)**:
 - [x] Game resolution and payout calculation
 - [x] Basic strategy lookup tables
 - [x] Strategy decision engine
+- [x] Basic simulation engine
+- [x] Dealer play automation
+- [x] Full game simulation loop
 - [ ] Double down action
 - [ ] Split hand support
 - [ ] Surrender action
-- [ ] Dealer play automation
-- [ ] Full game simulation
-- [ ] Monte Carlo simulation engine
 
 ### Advanced Features
 - [ ] Expected value calculations
