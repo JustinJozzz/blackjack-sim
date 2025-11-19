@@ -114,7 +114,7 @@ TEST(game_initialization) {
     GameState game;
     game_init(&game, &rules, 10.0);
 
-    assert(game.bet == 10.0);
+    assert(game.player_bets[0] == 10.0);
     assert(game.game_over == false);
     assert(game.deck.num_decks == rules.num_decks);
 
@@ -130,7 +130,7 @@ TEST(game_initial_deal) {
     game_deal_initial(&game);
 
     // Player should have 2 cards
-    assert(game.player_hand.num_cards == 2);
+    assert(game.player_hands[0].num_cards == 2);
 
     // Dealer should have 2 cards
     assert(game.dealer_hand.num_cards == 2);
@@ -149,10 +149,10 @@ TEST(game_player_hits) {
     game_init(&game, &rules, 10.0);
     game_deal_initial(&game);
 
-    int initial_cards = game.player_hand.num_cards;
-    game_play_action(&game, HIT);
+    int initial_cards = game.player_hands[0].num_cards;
+    game_play_action(&game, HIT, 0);
 
-    assert(game.player_hand.num_cards == initial_cards + 1);
+    assert(game.player_hands[0].num_cards == initial_cards + 1);
 
     game_destroy(&game);
 }
@@ -165,15 +165,15 @@ TEST(game_player_stands) {
     game_init(&game, &rules, 10.0);
     game_deal_initial(&game);
 
-    int player_cards = game.player_hand.num_cards;
-    game_play_action(&game, STAND);
+    int player_cards = game.player_hands[0].num_cards;
+    game_play_action(&game, STAND, 0);
 
     // Player hand should not change
-    assert(game.player_hand.num_cards == player_cards);
+    assert(game.player_hands[0].num_cards == player_cards);
 
-    // After stand, dealer should play (will have more than 2 cards unless 17+)
-    int dealer_value = hand_get_value(&game.dealer_hand);
-    assert(dealer_value >= 17 || dealer_value == 0); // 0 if busted
+    // STAND action doesn't trigger dealer play - that's handled by simulation
+    // Dealer should still have initial 2 cards
+    assert(game.dealer_hand.num_cards == 2);
 
     game_destroy(&game);
 }
@@ -184,19 +184,20 @@ TEST(game_player_busts) {
 
     GameState game;
     game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually instead of dealing
 
     // Force a bust scenario: give player 10, 10, then hit with 10
-    hand_add_card(&game.player_hand, 9);   // 10
-    hand_add_card(&game.player_hand, 9);   // 10
+    hand_add_card(&game.player_hands[0], 9);   // 10
+    hand_add_card(&game.player_hands[0], 9);   // 10
     hand_add_card(&game.dealer_hand, 9);   // Dealer 10
     hand_add_card(&game.dealer_hand, 5);   // Dealer 6
 
-    game_play_action(&game, HIT);
+    game_play_action(&game, HIT, 0);
     // After hitting, if we get high card, we bust
 
-    if (hand_get_value(&game.player_hand) > 21) {
+    if (hand_get_value(&game.player_hands[0]) > 21) {
         double payout = game_resolve(&game);
-        assert(payout == 0.0);  // Lose bet
+        assert(payout == 0.0);  // Lose bet - total payout is 0
     }
 
     game_destroy(&game);
@@ -208,20 +209,21 @@ TEST(game_blackjack_payout) {
 
     GameState game;
     game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
 
     // Give player blackjack
-    hand_add_card(&game.player_hand, 0);   // Ace
-    hand_add_card(&game.player_hand, 9);   // 10
+    hand_add_card(&game.player_hands[0], 0);   // Ace
+    hand_add_card(&game.player_hands[0], 9);   // 10
 
     // Give dealer non-blackjack
     hand_add_card(&game.dealer_hand, 9);   // 10
     hand_add_card(&game.dealer_hand, 6);   // 7
 
-    game_play_action(&game, STAND);
+    game_play_action(&game, STAND, 0);
     double payout = game_resolve(&game);
 
-    // Should get 2.5x bet (original + 1.5x winnings)
-    assert(payout == 2.5);
+    // Should get 2.5x bet (original + 1.5x winnings) = 10 * 2.5 = 25.0
+    assert(payout == 25.0);
 
     game_destroy(&game);
 }
@@ -232,20 +234,21 @@ TEST(game_player_wins) {
 
     GameState game;
     game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
 
     // Player: 20
-    hand_add_card(&game.player_hand, 9);   // 10
-    hand_add_card(&game.player_hand, 9);   // 10
+    hand_add_card(&game.player_hands[0], 9);   // 10
+    hand_add_card(&game.player_hands[0], 9);   // 10
 
     // Dealer: 19
     hand_add_card(&game.dealer_hand, 9);   // 10
     hand_add_card(&game.dealer_hand, 8);   // 9
 
-    game_play_action(&game, STAND);
+    game_play_action(&game, STAND, 0);
     double payout = game_resolve(&game);
 
-    // Should get 2x bet (original + 1x winnings)
-    assert(payout == 2.0);
+    // Should get 2x bet (original + 1x winnings) = 10 * 2.0 = 20.0
+    assert(payout == 20.0);
 
     game_destroy(&game);
 }
@@ -256,18 +259,19 @@ TEST(game_push) {
 
     GameState game;
     game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
 
     // Both have 20
-    hand_add_card(&game.player_hand, 9);   // 10
-    hand_add_card(&game.player_hand, 9);   // 10
+    hand_add_card(&game.player_hands[0], 9);   // 10
+    hand_add_card(&game.player_hands[0], 9);   // 10
     hand_add_card(&game.dealer_hand, 9);   // 10
     hand_add_card(&game.dealer_hand, 9);   // 10
 
-    game_play_action(&game, STAND);
+    game_play_action(&game, STAND, 0);
     double payout = game_resolve(&game);
 
-    // Push - get bet back
-    assert(payout == 1.0);
+    // Push - get bet back = 10 * 1.0 = 10.0
+    assert(payout == 10.0);
 
     game_destroy(&game);
 }
@@ -278,22 +282,21 @@ TEST(game_dealer_busts) {
 
     GameState game;
     game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
 
     // Player: 18
-    hand_add_card(&game.player_hand, 9);   // 10
-    hand_add_card(&game.player_hand, 7);   // 8
+    hand_add_card(&game.player_hands[0], 9);   // 10
+    hand_add_card(&game.player_hands[0], 7);   // 8
 
-    // Dealer will bust (10 + 6 + high card)
+    // Dealer busts with 22
     hand_add_card(&game.dealer_hand, 9);   // 10
     hand_add_card(&game.dealer_hand, 5);   // 6
+    hand_add_card(&game.dealer_hand, 5);   // 6 -> 22
 
-    game_play_action(&game, STAND);
+    game_play_action(&game, STAND, 0);
 
-    // Dealer must draw and will likely bust
-    if (hand_get_value(&game.dealer_hand) > 21) {
-        double payout = game_resolve(&game);
-        assert(payout == 2.0);  // Player wins
-    }
+    double payout = game_resolve(&game);
+    assert(payout == 20.0);  // Player wins: 10 * 2.0 = 20.0
 
     game_destroy(&game);
 }
@@ -304,21 +307,157 @@ TEST(game_twentyone_not_blackjack) {
 
     GameState game;
     game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
 
     // Player: 21 with 3 cards (7+7+7) - NOT a blackjack
-    hand_add_card(&game.player_hand, 6);   // 7
-    hand_add_card(&game.player_hand, 6);   // 7
-    hand_add_card(&game.player_hand, 6);   // 7
+    hand_add_card(&game.player_hands[0], 6);   // 7
+    hand_add_card(&game.player_hands[0], 6);   // 7
+    hand_add_card(&game.player_hands[0], 6);   // 7
 
     // Dealer: 20
     hand_add_card(&game.dealer_hand, 9);   // 10
     hand_add_card(&game.dealer_hand, 9);   // 10
 
-    game_play_action(&game, STAND);
+    game_play_action(&game, STAND, 0);
     double payout = game_resolve(&game);
 
-    // Should get 2.0x (regular win), NOT 2.5x (blackjack payout)
-    assert(payout == 2.0);
+    // Should get 2.0x (regular win), NOT 2.5x (blackjack payout) = 10 * 2.0 = 20.0
+    assert(payout == 20.0);
+
+    game_destroy(&game);
+}
+
+// ============================================================================
+// DOUBLE DOWN TESTS
+// ============================================================================
+
+TEST(game_player_doubles_down) {
+    Rules rules;
+    rules_init(&rules);
+
+    GameState game;
+    game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
+
+    // Player: 11 (good double situation)
+    hand_add_card(&game.player_hands[0], 5);   // 6
+    hand_add_card(&game.player_hands[0], 4);   // 5
+
+    // Dealer: some hand
+    hand_add_card(&game.dealer_hand, 5);   // 6
+    hand_add_card(&game.dealer_hand, 4);   // 5
+
+    int initial_cards = game.player_hands[0].num_cards;
+    double initial_bet = game.player_bets[0];
+
+    game_play_action(&game, DOUBLE, 0);
+
+    // Should have exactly one more card
+    assert(game.player_hands[0].num_cards == initial_cards + 1);
+
+    // Bet should be doubled
+    assert(game.player_bets[0] == initial_bet * 2);
+
+    game_destroy(&game);
+}
+
+TEST(game_double_down_wins) {
+    Rules rules;
+    rules_init(&rules);
+
+    GameState game;
+    game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
+
+    // Player: 11, will get 9 = 20
+    hand_add_card(&game.player_hands[0], 5);   // 6
+    hand_add_card(&game.player_hands[0], 4);   // 5
+
+    // Dealer: 18
+    hand_add_card(&game.dealer_hand, 9);   // 10
+    hand_add_card(&game.dealer_hand, 7);   // 8
+
+    game_play_action(&game, DOUBLE, 0);
+
+    // Bet should now be 20.0
+    assert(game.player_bets[0] == 20.0);
+
+    // If player wins, payout should reflect doubled bet
+    double payout = game_resolve(&game);
+
+    // If player won, payout should be 2.0x the doubled bet = 20 * 2.0 = 40.0
+    if (hand_get_value(&game.player_hands[0]) > hand_get_value(&game.dealer_hand) &&
+        hand_get_value(&game.player_hands[0]) <= 21) {
+        assert(payout == 40.0);
+    }
+
+    game_destroy(&game);
+}
+
+// ============================================================================
+// SPLIT TESTS
+// ============================================================================
+
+TEST(game_player_splits_pair) {
+    Rules rules;
+    rules_init(&rules);
+
+    GameState game;
+    game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
+
+    // Player: pair of 8s
+    hand_add_card(&game.player_hands[0], 7);   // 8
+    hand_add_card(&game.player_hands[0], 7);   // 8
+
+    // Dealer: some hand
+    hand_add_card(&game.dealer_hand, 5);   // 6
+    hand_add_card(&game.dealer_hand, 4);   // 5
+
+    assert(hand_can_split(&game.player_hands[0]) == true);
+
+    game_play_action(&game, SPLIT, 0);
+
+    // Should now have 2 hands
+    assert(game.num_player_hands == 2);
+
+    // Each split hand should have 2 cards (1 original + 1 new card)
+    assert(game.player_hands[0].num_cards == 2);
+    assert(game.player_hands[1].num_cards == 2);
+
+    // Both bets should be equal
+    assert(game.player_bets[0] == 10.0);
+    assert(game.player_bets[1] == 10.0);
+
+    game_destroy(&game);
+}
+
+TEST(game_split_aces) {
+    Rules rules;
+    rules_init(&rules);
+
+    GameState game;
+    game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
+
+    // Player: pair of Aces
+    hand_add_card(&game.player_hands[0], 0);   // Ace
+    hand_add_card(&game.player_hands[0], 0);   // Ace
+
+    // Dealer: some hand
+    hand_add_card(&game.dealer_hand, 9);   // 10
+    hand_add_card(&game.dealer_hand, 6);   // 7
+
+    game_play_action(&game, SPLIT, 0);
+
+    // Split aces get one card each (2 cards total per hand)
+    assert(game.num_player_hands == 2);
+    assert(game.player_hands[0].num_cards == 2);
+    assert(game.player_hands[1].num_cards == 2);
+
+    // Each hand should start with an Ace
+    assert(game.player_hands[0].cards[0] == 0);  // Ace
+    assert(game.player_hands[1].cards[0] == 0);  // Ace
 
     game_destroy(&game);
 }
@@ -346,6 +485,14 @@ int main(void) {
     run_test_game_push();
     run_test_game_dealer_busts();
     run_test_game_twentyone_not_blackjack();
+
+    // Double down tests
+    run_test_game_player_doubles_down();
+    run_test_game_double_down_wins();
+
+    // Split tests
+    run_test_game_player_splits_pair();
+    run_test_game_split_aces();
 
     printf("\n==================================\n");
     printf("Tests passed: %d/%d\n", tests_passed, tests_run);

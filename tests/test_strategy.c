@@ -198,7 +198,38 @@ TEST(simulation_initialization) {
     assert(results.hands_played == 1000);
     assert(results.hands_won > 0);
     assert(results.hands_lost > 0);
-    assert(results.total_bet == 1000.0);  // Assuming $1 per hand
+    // With doubles and splits, total bet will be > base amount
+    assert(results.total_bet >= 1000.0);  // At least $1 per hand
+    assert(results.total_bet < 2000.0);   // But not absurdly high
+}
+
+TEST(simulation_double_and_split_actions) {
+    SimulationConfig config;
+    rules_init(&config.rules);
+    basic_strategy_init(&config.strategy);
+    config.num_hands = 10000;  // Larger sample to ensure doubles/splits occur
+    config.bet_per_hand = 1.0;
+
+    SimulationResults results = {0};
+
+    simulation_run(&config, &results);
+
+    // With basic strategy and 10k hands, we should see:
+    // - Doubles: ~9-11% of hands (player has 9, 10, 11, or soft totals)
+    // - Splits: ~3-5% of hands (pairs that should be split)
+
+    assert(results.doubles_taken > 0);  // Should have doubled at least once
+    assert(results.splits_taken > 0);   // Should have split at least once
+
+    // More specific: expect at least 5% doubles and 2% splits
+    assert(results.doubles_taken > results.hands_played * 0.05);
+    assert(results.splits_taken > results.hands_played * 0.02);
+
+    printf("\n  Doubles: %d (%.1f%%), Splits: %d (%.1f%%)",
+           results.doubles_taken,
+           (double)results.doubles_taken / results.hands_played * 100,
+           results.splits_taken,
+           (double)results.splits_taken / results.hands_played * 100);
 }
 
 // TEST(simulation_basic_strategy_ev) {
@@ -327,6 +358,7 @@ int main(void) {
 
     // Simulation tests
     run_test_simulation_initialization();
+    run_test_simulation_double_and_split_actions();
     // run_test_simulation_basic_strategy_ev();
     // run_test_simulation_win_rate();
     // run_test_simulation_blackjack_frequency();

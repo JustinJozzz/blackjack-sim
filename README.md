@@ -49,20 +49,21 @@ This project simulates thousands of blackjack hands to determine the mathematica
 - Late surrender strategy (14-16 vs dealer 9-A)
 - Strategy lookup with rule compliance (DAS, surrender, doubling)
 
-⏳ **Phase 5: Monte Carlo Simulation** (1/1 tests passing)
+✅ **Phase 5: Monte Carlo Simulation** (2/2 tests passing)
 - Basic simulation engine
 - Game state initialization and cleanup
 - Player and dealer play automation
 - Win/loss/push tracking
 - Bet and payout tracking
 - House edge calculation
+- Double and split action tracking
 
-⏳ **Phase 6: Advanced Game Actions** (Next)
-- Double down implementation
-- Split hand support
-- Surrender implementation
-- Expected value calculations
-- Strategy validation
+✅ **Phase 6: Advanced Game Actions** (2/2 tests passing)
+- Double down implementation (~15% of hands)
+- Split hand support (~3% of hands)
+- Multiple hand management with parallel bets
+- Surrender implementation (ready for testing)
+- Round-level payout resolution
 
 ## Project Structure
 
@@ -74,15 +75,15 @@ blackjack-sim/
 │   ├── hand.c/h          ✅ Hand management (14/14 tests passing)
 │   ├── rules.c/h         ✅ Game rules (10/10 tests passing)
 │   ├── dealer.c/h        ✅ Dealer logic (4/4 tests passing)
-│   ├── game.c/h          ✅ Core game logic (14/14 tests passing)
+│   ├── game.c/h          ✅ Core game logic (18/18 tests passing)
 │   ├── strategy.c/h      ✅ Basic strategy lookup (6/6 tests passing)
-│   └── simulation.c/h    ✅ Monte Carlo engine (1/1 tests passing)
+│   └── simulation.c/h    ✅ Monte Carlo engine (2/2 tests passing)
 ├── tests/
 │   ├── test_game.c       ✅ Deck tests (3/3 passing)
 │   ├── test_hand.c       ✅ Card & hand tests (14/14 passing)
 │   ├── test_rules.c      ✅ Rules tests (10/10 passing)
-│   ├── test_game_logic.c ✅ Dealer & game tests (14/14 passing)
-│   └── test_strategy.c   ✅ Strategy & simulation tests (7/7 passing)
+│   ├── test_game_logic.c ✅ Dealer & game tests (18/18 passing)
+│   └── test_strategy.c   ✅ Strategy & simulation tests (8/8 passing)
 ├── .vscode/              🔧 VS Code debug configurations
 ├── ARCHITECTURE.md       📖 System design overview
 ├── IMPLEMENTATION_GUIDE.md 📖 Step-by-step implementation guide
@@ -101,17 +102,18 @@ make test
 - ✅ Card utilities: 4/4 tests passing
 - ✅ Hand management: 14/14 tests passing
 - ✅ Game rules: 10/10 tests passing
-- ✅ Dealer & game logic: 14/14 tests passing
+- ✅ Dealer & game logic: 18/18 tests passing (includes double/split!)
 - ✅ Basic strategy: 6/6 tests passing
-- ✅ Simulation engine: 1/1 tests passing
+- ✅ Simulation engine: 2/2 tests passing
 
-**Total: 48/48 tests passing**
+**Total: 53/53 tests passing**
 
 ### Next Steps
 Continue simulation development and advanced features:
 - **Advanced Simulation Tests**: Expected value, win rate validation, rule variations
-- **Game Actions**: Double down, split hands, surrender in [src/game.c](src/game.c)
 - **Strategy Validation**: Verify basic strategy house edge (~0.5%)
+- **Surrender Testing**: Add comprehensive surrender action tests
+- **Performance Optimization**: Large-scale simulations (100k+ hands)
 
 See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed implementation steps.
 
@@ -152,17 +154,17 @@ This project follows **Test-Driven Development (TDD)**:
 - [x] Basic simulation engine
 - [x] Dealer play automation
 - [x] Full game simulation loop
-- [ ] Double down action
-- [ ] Split hand support
-- [ ] Surrender action
+- [x] Double down action (~15% frequency)
+- [x] Split hand support (~3% frequency)
+- [x] Surrender action (ready for testing)
 
 ### Advanced Features
 - [ ] Expected value calculations
 - [ ] Strategy table generation from simulation
-- [ ] Split hand support
-- [ ] Surrender support
 - [ ] Multiple rule set comparison
 - [ ] Card counting integration
+- [ ] Resplit and resplit aces edge cases
+- [ ] Early surrender vs late surrender
 - [ ] Performance optimization
 
 ## Expected Results

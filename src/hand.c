@@ -22,6 +22,13 @@ void hand_add_card(Hand* hand, int card) {
     hand->num_cards++;
 }
 
+int hand_pop_card(Hand* hand) {
+    int pop_card = hand->cards[hand->num_cards-1];
+    hand->num_cards--;
+
+    return pop_card;
+}
+
 int hand_get_value(Hand* hand) {
     int sum = 0;
     int ace_count = 0;

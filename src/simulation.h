@@ -13,6 +13,8 @@ typedef struct {
     int hands_won;
     int hands_lost;
     int hands_pushed;
+    int doubles_taken;
+    int splits_taken;
     double total_bet;
     double total_payout;
     double house_edge;
