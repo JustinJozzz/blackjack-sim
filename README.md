@@ -58,11 +58,11 @@ This project simulates thousands of blackjack hands to determine the mathematica
 - House edge calculation
 - Double and split action tracking
 
-✅ **Phase 6: Advanced Game Actions** (2/2 tests passing)
+✅ **Phase 6: Advanced Game Actions** (5/5 tests passing)
 - Double down implementation (~15% of hands)
 - Split hand support (~3% of hands)
+- Surrender implementation (0.5x payout)
 - Multiple hand management with parallel bets
-- Surrender implementation (ready for testing)
 - Round-level payout resolution
 
 ## Project Structure
@@ -75,14 +75,14 @@ blackjack-sim/
 │   ├── hand.c/h          ✅ Hand management (14/14 tests passing)
 │   ├── rules.c/h         ✅ Game rules (10/10 tests passing)
 │   ├── dealer.c/h        ✅ Dealer logic (4/4 tests passing)
-│   ├── game.c/h          ✅ Core game logic (18/18 tests passing)
+│   ├── game.c/h          ✅ Core game logic (21/21 tests passing)
 │   ├── strategy.c/h      ✅ Basic strategy lookup (6/6 tests passing)
 │   └── simulation.c/h    ✅ Monte Carlo engine (2/2 tests passing)
 ├── tests/
 │   ├── test_game.c       ✅ Deck tests (3/3 passing)
 │   ├── test_hand.c       ✅ Card & hand tests (14/14 passing)
 │   ├── test_rules.c      ✅ Rules tests (10/10 passing)
-│   ├── test_game_logic.c ✅ Dealer & game tests (18/18 passing)
+│   ├── test_game_logic.c ✅ Dealer & game tests (21/21 passing)
 │   └── test_strategy.c   ✅ Strategy & simulation tests (8/8 passing)
 ├── .vscode/              🔧 VS Code debug configurations
 ├── ARCHITECTURE.md       📖 System design overview
@@ -102,18 +102,18 @@ make test
 - ✅ Card utilities: 4/4 tests passing
 - ✅ Hand management: 14/14 tests passing
 - ✅ Game rules: 10/10 tests passing
-- ✅ Dealer & game logic: 18/18 tests passing (includes double/split!)
+- ✅ Dealer & game logic: 21/21 tests passing (includes double/split/surrender!)
 - ✅ Basic strategy: 6/6 tests passing
 - ✅ Simulation engine: 2/2 tests passing
 
-**Total: 53/53 tests passing**
+**Total: 56/56 tests passing**
 
 ### Next Steps
 Continue simulation development and advanced features:
 - **Advanced Simulation Tests**: Expected value, win rate validation, rule variations
 - **Strategy Validation**: Verify basic strategy house edge (~0.5%)
-- **Surrender Testing**: Add comprehensive surrender action tests
 - **Performance Optimization**: Large-scale simulations (100k+ hands)
+- **Edge Case Testing**: Resplit aces, multiple splits, dealer blackjack
 
 See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed implementation steps.
 

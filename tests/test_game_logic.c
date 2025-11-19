@@ -395,6 +395,108 @@ TEST(game_double_down_wins) {
 }
 
 // ============================================================================
+// SURRENDER TESTS
+// ============================================================================
+
+TEST(game_player_surrenders) {
+    Rules rules;
+    rules_init(&rules);
+    rules.late_surrender_allowed = true;
+
+    GameState game;
+    game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
+
+    // Player: 16 (bad situation)
+    hand_add_card(&game.player_hands[0], 9);   // 10
+    hand_add_card(&game.player_hands[0], 5);   // 6
+
+    // Dealer: 10
+    hand_add_card(&game.dealer_hand, 9);   // 10
+    hand_add_card(&game.dealer_hand, 6);   // 7
+
+    assert(game.surrendered == false);
+
+    game_play_action(&game, SURRENDER, 0);
+
+    // Should set surrendered flag
+    assert(game.surrendered == true);
+
+    game_destroy(&game);
+}
+
+TEST(game_surrender_payout) {
+    Rules rules;
+    rules_init(&rules);
+    rules.late_surrender_allowed = true;
+
+    GameState game;
+    game_init(&game, &rules, 10.0);
+    game.num_player_hands = 1;  // Set up manually
+
+    // Player: 16
+    hand_add_card(&game.player_hands[0], 9);   // 10
+    hand_add_card(&game.player_hands[0], 5);   // 6
+
+    // Dealer: 10
+    hand_add_card(&game.dealer_hand, 9);   // 10
+    hand_add_card(&game.dealer_hand, 6);   // 7
+
+    game_play_action(&game, SURRENDER, 0);
+    double payout = game_resolve(&game);
+
+    // Should get 0.5x bet back (half the bet) = 10 * 0.5 = 5.0
+    assert(payout == 5.0);
+
+    game_destroy(&game);
+}
+
+TEST(game_surrender_vs_losing) {
+    Rules rules;
+    rules_init(&rules);
+
+    GameState game_surrender;
+    game_init(&game_surrender, &rules, 10.0);
+    game_surrender.num_player_hands = 1;
+
+    // Player: 16 (will likely lose)
+    hand_add_card(&game_surrender.player_hands[0], 9);   // 10
+    hand_add_card(&game_surrender.player_hands[0], 5);   // 6
+
+    // Dealer: 20 (strong hand)
+    hand_add_card(&game_surrender.dealer_hand, 9);   // 10
+    hand_add_card(&game_surrender.dealer_hand, 9);   // 10
+
+    game_play_action(&game_surrender, SURRENDER, 0);
+    double surrender_payout = game_resolve(&game_surrender);
+
+    // Surrender gets 5.0 back
+    assert(surrender_payout == 5.0);
+
+    // Compare to playing it out and losing
+    GameState game_lose;
+    game_init(&game_lose, &rules, 10.0);
+    game_lose.num_player_hands = 1;
+
+    hand_add_card(&game_lose.player_hands[0], 9);   // 10
+    hand_add_card(&game_lose.player_hands[0], 5);   // 6
+    hand_add_card(&game_lose.dealer_hand, 9);   // 10
+    hand_add_card(&game_lose.dealer_hand, 9);   // 10
+
+    game_play_action(&game_lose, STAND, 0);
+    double lose_payout = game_resolve(&game_lose);
+
+    // Standing and losing gets 0.0 back
+    assert(lose_payout == 0.0);
+
+    // Surrender is better than losing
+    assert(surrender_payout > lose_payout);
+
+    game_destroy(&game_surrender);
+    game_destroy(&game_lose);
+}
+
+// ============================================================================
 // SPLIT TESTS
 // ============================================================================
 
@@ -489,6 +591,11 @@ int main(void) {
     // Double down tests
     run_test_game_player_doubles_down();
     run_test_game_double_down_wins();
+
+    // Surrender tests
+    run_test_game_player_surrenders();
+    run_test_game_surrender_payout();
+    run_test_game_surrender_vs_losing();
 
     // Split tests
     run_test_game_player_splits_pair();
