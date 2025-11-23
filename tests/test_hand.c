@@ -302,6 +302,57 @@ TEST(hand_double_detection) {
     hand_destroy(&hand);
 }
 
+TEST(hand_soft_detection_without_ace) {
+    // BUG FIX TEST: Verify hands without Aces are NOT detected as soft
+    // This was a critical bug causing -8.5% EV instead of -0.5%
+
+    // Hard 10 (5 + 5) - should NOT be soft
+    Hand hand1;
+    hand_init(&hand1);
+    hand_add_card(&hand1, 4);  // 5
+    hand_add_card(&hand1, 4);  // 5
+    assert(hand_get_value(&hand1) == 10);
+    assert(hand_is_soft(&hand1) == false);  // Critical: should be hard, not soft
+    hand_destroy(&hand1);
+
+    // Hard 10 (6 + 4) - should NOT be soft
+    Hand hand2;
+    hand_init(&hand2);
+    hand_add_card(&hand2, 5);  // 6
+    hand_add_card(&hand2, 3);  // 4
+    assert(hand_get_value(&hand2) == 10);
+    assert(hand_is_soft(&hand2) == false);  // Critical: should be hard, not soft
+    hand_destroy(&hand2);
+
+    // Hard 10 (7 + 3) - should NOT be soft
+    Hand hand3;
+    hand_init(&hand3);
+    hand_add_card(&hand3, 6);  // 7
+    hand_add_card(&hand3, 2);  // 3
+    assert(hand_get_value(&hand3) == 10);
+    assert(hand_is_soft(&hand3) == false);  // Critical: should be hard, not soft
+    hand_destroy(&hand3);
+
+    // Verify hands WITH Aces ARE detected as soft when appropriate
+    Hand hand4;
+    hand_init(&hand4);
+    hand_add_card(&hand4, 0);  // Ace
+    hand_add_card(&hand4, 5);  // 6 -> soft 17
+    assert(hand_get_value(&hand4) == 17);
+    assert(hand_is_soft(&hand4) == true);   // Should be soft
+    hand_destroy(&hand4);
+
+    // Verify Ace counts as 1 when it must (becomes hard hand)
+    Hand hand5;
+    hand_init(&hand5);
+    hand_add_card(&hand5, 0);  // Ace
+    hand_add_card(&hand5, 9);  // 10
+    hand_add_card(&hand5, 4);  // 5 -> 16 (Ace must be 1)
+    assert(hand_get_value(&hand5) == 16);
+    assert(hand_is_soft(&hand5) == false);  // Should be hard
+    hand_destroy(&hand5);
+}
+
 int main(void) {
     printf("Running Hand & Card Tests\n");
     printf("==================================\n\n");
@@ -325,6 +376,7 @@ int main(void) {
     run_test_hand_blackjack_detection();
     run_test_hand_split_detection();
     run_test_hand_double_detection();
+    run_test_hand_soft_detection_without_ace();
 
     printf("\n==================================\n");
     printf("Tests passed: %d/%d\n", tests_passed, tests_run);

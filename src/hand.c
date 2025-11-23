@@ -55,15 +55,22 @@ int hand_get_value(Hand* hand) {
 
 bool hand_is_soft(Hand* hand) {
     int sum = 0;
+    bool has_ace = false;
 
     for (int i = 0; i < hand->num_cards; i++) {
         int val = card_value(hand->cards[i]);
-        if (val != ACE_MAX_VAL) {
+        if (val != ACE_MAX_VAL) 
+        {
             sum += val;
+        }
+
+        if (card_rank(hand->cards[i]) == 0) 
+        {
+            has_ace = true;
         }
     }
 
-    if (sum <= BLACKJACK_VAL - ACE_MAX_VAL) {
+    if (has_ace && sum <= BLACKJACK_VAL - ACE_MAX_VAL) {
         return true;
     }
 

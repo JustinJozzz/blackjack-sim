@@ -13,9 +13,19 @@ static inline int xorshift32(void) {
     return x;
 }
 
-// To get a number in a range [0, max)
+// To get a number in a range [0, max) without modulo bias
 int random_range(int max) {
-    return xorshift32() % max;
+    if (max <= 0) return 0;
+
+    // Use rejection sampling to avoid modulo bias
+    int limit = 0x7FFFFFFF - (0x7FFFFFFF % max);  // Largest multiple of max
+    int value;
+
+    do {
+        value = xorshift32() & 0x7FFFFFFF;  // Force positive by masking sign bit
+    } while (value >= limit);
+
+    return value % max;
 }
 
 void deck_init(Deck* deck, int num_decks) {
@@ -48,4 +58,8 @@ int deck_deal(Deck* deck) {
 
 void deck_destroy(Deck* deck) {
     free(deck->cards);
+}
+
+void deck_set_rng_seed(int seed) {
+    rng_state = seed;
 }

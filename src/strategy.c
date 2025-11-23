@@ -313,7 +313,7 @@ void basic_strategy_init(BasicStrategy* strategy) {
     strategy->surrender[DEALER_IDX(10)][SUR_IDX_15] = true;
 }
 
-PlayerAction get_basic_strategy_action(Hand* player_hand, int dealer_up_card, Rules* rules, BasicStrategy* strategy, bool can_split, bool can_double) {
+PlayerAction get_basic_strategy_action(Hand* player_hand, int dealer_up_card, Rules* rules, BasicStrategy* strategy, bool can_split, bool can_double, bool can_surrender) {
     int player_hand_value = hand_get_value(player_hand);
     int dealer_up_card_value = card_value(dealer_up_card);
     int dealer_idx = DEALER_IDX(dealer_up_card_value);
@@ -339,6 +339,20 @@ PlayerAction get_basic_strategy_action(Hand* player_hand, int dealer_up_card, Ru
 
     // 2. Check if hand is soft and look up soft_totals table
     if (hand_is_soft(player_hand)) {
+        // Soft totals table only covers A-2 (13) through A-9 (20)
+        // Handle edge cases: soft 12 (A-A) and soft 21 (e.g., A-2-8)
+        if (player_hand_value >= 19) {
+            // Soft 19, 20, 21: always stand (unless doubling on soft 19 vs 6)
+            if (player_hand_value == 19 && dealer_up_card_value == 6 && can_double && rules->double_any_two_cards) {
+                return DOUBLE;
+            }
+            return STAND;
+        }
+        if (player_hand_value < 13) {
+            // Soft 12 (A-A): should only occur if can't split; always hit
+            return HIT;
+        }
+
         SoftHandPlayerAction action = strategy->soft_totals[dealer_idx][SOFT_IDX(player_hand_value)];
         switch (action) {
             case SOFT_HIT:
@@ -359,7 +373,7 @@ PlayerAction get_basic_strategy_action(Hand* player_hand, int dealer_up_card, Ru
     }
 
     // 3. Check if should surrender and look up surrender table
-    if (rules->late_surrender_allowed && player_hand_value >= 14 && player_hand_value <= 16) {
+    if (can_surrender && rules->late_surrender_allowed && player_hand_value >= 14 && player_hand_value <= 16) {
         int surrender_idx = player_hand_value - 14;  // 14->0, 15->1, 16->2
         if (strategy->surrender[dealer_idx][surrender_idx]) {
             return SURRENDER;

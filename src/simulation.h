@@ -21,3 +21,5 @@ typedef struct {
 } SimulationResults;
 
 void simulation_run(SimulationConfig* simulation_config_init, SimulationResults* simulation_results);
+
+double simulation_get_ev(SimulationResults* simulation_result);

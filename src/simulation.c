@@ -1,6 +1,7 @@
 #include "simulation.h"
 #include "game.h"
 #include "card.h"
+#include <stdio.h>
 
 bool can_split(Rules *rules, int curr_player_hands, bool split_aces)
 {
@@ -34,14 +35,30 @@ bool can_double(Rules *rules, PlayerAction curr_player_action, int cards_in_hand
 
 void simulation_run(SimulationConfig *simulation_config, SimulationResults *simulation_results)
 {
+    bool debug = false; // Set to true to debug first hand
     for (int i = 0; i < simulation_config->num_hands; i++)
     {
+        debug = false; // Disabled
         GameState game;
         game_init(&game, &simulation_config->rules, simulation_config->bet_per_hand);
         game_deal_initial(&game);
+        if (debug) {
+            printf("\n=== Hand %d ===\n", i);
+            printf("Player: %d, Dealer up: %d\n",
+                   hand_get_value(&game.player_hands[0]),
+                   card_value(game.dealer_hand.cards[0]));
+        }
 
+        // Check for dealer blackjack (if peek rules enabled)
+        bool dealer_has_blackjack = false;
+        if (game.rules.dealer_peeks_blackjack && hand_is_blackjack(&game.dealer_hand)) {
+            dealer_has_blackjack = true;
+            if (debug) printf("Dealer has blackjack! Round ends immediately.\n");
+        }
+
+        // Player plays all hands (only if dealer doesn't have blackjack)
         int player_hand_index = 0;
-        while (player_hand_index != game.num_player_hands)
+        while (player_hand_index < game.num_player_hands && !dealer_has_blackjack)
         {
             PlayerAction curr_player_action = HIT;
             bool player_bust = false;
@@ -51,7 +68,17 @@ void simulation_run(SimulationConfig *simulation_config, SimulationResults *simu
                 curr_player_action = get_basic_strategy_action(&game.player_hands[player_hand_index],
                                                                game.dealer_hand.cards[0], &simulation_config->rules, &simulation_config->strategy,
                                                                can_split(&game.rules, game.num_player_hands, split_aces),
-                                                               can_double(&game.rules, curr_player_action, game.player_hands[player_hand_index].num_cards));
+                                                               can_double(&game.rules, curr_player_action, game.player_hands[player_hand_index].num_cards),
+                                                               game.num_player_hands == 1 && game.player_hands[player_hand_index].num_cards == 2);
+
+                if (debug) {
+                    const char* actions[] = {"HIT", "STAND", "DOUBLE", "SPLIT", "SURRENDER"};
+                    printf("Hand %d (value=%d, soft=%d): Action = %s\n",
+                           player_hand_index,
+                           hand_get_value(&game.player_hands[player_hand_index]),
+                           hand_is_soft(&game.player_hands[player_hand_index]),
+                           actions[curr_player_action]);
+                }
 
                 split_aces = false;
                 // Track doubles and splits
@@ -71,18 +98,39 @@ void simulation_run(SimulationConfig *simulation_config, SimulationResults *simu
                 game_play_action(&game, curr_player_action, player_hand_index);
 
                 int hand_value = hand_get_value(&game.player_hands[player_hand_index]);
+                if (debug) printf("After action, player hand %d value: %d\n", player_hand_index, hand_value);
                 if (hand_value > 21)
                 {
                     player_bust = true;
+                    if (debug) printf("Player hand %d BUSTED\n", player_hand_index);
                 }
             }
 
+            player_hand_index++;
+        }
+
+        // Dealer plays once after all player hands are complete
+        // Only play if dealer doesn't have blackjack and at least one player hand didn't bust
+        bool all_hands_busted = true;
+        for (int i = 0; i < game.num_player_hands; i++) {
+            if (hand_get_value(&game.player_hands[i]) <= 21) {
+                all_hands_busted = false;
+                break;
+            }
+        }
+
+        if (!dealer_has_blackjack && !all_hands_busted) {
             PlayerAction curr_dealer_action = HIT;
-            bool dealer_bust = false;
-            while (!player_bust && !dealer_bust && curr_dealer_action != STAND)
+            if (debug) printf("Dealer playing...\n");
+            while (curr_dealer_action != STAND)
             {
                 int hand_value = hand_get_value(&game.dealer_hand);
-                if (hand_value >= 17)
+                if (debug) printf("Dealer hand value: %d\n", hand_value);
+                if (hand_value == 17 && hand_is_soft(&game.dealer_hand) && game.rules.dealer_hits_soft_17)
+                {
+                    curr_dealer_action = HIT;
+                }
+                else if (hand_value >= 17)
                 {
                     curr_dealer_action = STAND;
                 }
@@ -96,8 +144,6 @@ void simulation_run(SimulationConfig *simulation_config, SimulationResults *simu
                     hand_add_card(&game.dealer_hand, deck_deal(&game.deck));
                 }
             }
-
-            player_hand_index++;
         }
 
         double round_payout = game_resolve(&game);
@@ -105,7 +151,17 @@ void simulation_run(SimulationConfig *simulation_config, SimulationResults *simu
         for (int i = 0; i < game.num_player_hands; i++) {
             round_bets += game.player_bets[i];
         }
-        if (round_payout == 0)
+        if (debug) {
+            printf("Final: Dealer=%d, Player hands=%d\n",
+                   hand_get_value(&game.dealer_hand), game.num_player_hands);
+            for (int i = 0; i < game.num_player_hands; i++) {
+                printf("  Hand %d: value=%d, bet=%.2f\n",
+                       i, hand_get_value(&game.player_hands[i]), game.player_bets[i]);
+            }
+            printf("Round bets: %.2f, Round payout: %.2f\n", round_bets, round_payout);
+            debug = false;
+        }
+        if (round_payout == 0 || round_payout < round_bets)
         {
             simulation_results->hands_lost++;
         } else if (round_payout > round_bets)
@@ -122,4 +178,9 @@ void simulation_run(SimulationConfig *simulation_config, SimulationResults *simu
         simulation_results->house_edge = (simulation_results->total_bet - simulation_results->total_payout) / simulation_results->total_bet;
         game_destroy(&game);
     }
+}
+
+double simulation_get_ev(SimulationResults* simulation_results)
+{
+    return -simulation_results->house_edge;
 }

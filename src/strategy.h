@@ -26,4 +26,4 @@ typedef struct {
 
 void basic_strategy_init(BasicStrategy* basic_strategy);
 
-PlayerAction get_basic_strategy_action(Hand* player_hand, int dealer_up_card, Rules* rules, BasicStrategy* strategy, bool can_split, bool can_double);
+PlayerAction get_basic_strategy_action(Hand* player_hand, int dealer_up_card, Rules* rules, BasicStrategy* strategy, bool can_split, bool can_double, bool can_surrender);

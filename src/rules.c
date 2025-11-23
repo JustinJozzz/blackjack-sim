@@ -11,7 +11,7 @@ void rules_init(Rules* rules) {
     rules->double_after_split = true;          // DAS allowed
     rules->can_resplit_aces = false;           // Usually not allowed
     rules->can_hit_split_aces = false;         // Usually only one card
-    rules->late_surrender_allowed = true;      // Common in Vegas
+    rules->late_surrender_allowed = true;      // Standard in many casinos
     rules->early_surrender_allowed = false;    // Rare
     
     // Doubling rules

@@ -14,3 +14,5 @@ void deck_shuffle(Deck* deck);
 int deck_deal(Deck* deck);
 
 void deck_destroy(Deck* deck);
+
+void deck_set_rng_seed(int seed);

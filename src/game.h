@@ -14,6 +14,7 @@ typedef struct {
     Hand* player_hands;
     int num_player_hands;
     double* player_bets;
+    double insurance_bet;
     Hand dealer_hand;
     Rules rules;
     bool surrendered;
@@ -27,5 +28,9 @@ void game_deal_initial(GameState* game_state);
 void game_play_action(GameState* game_state, PlayerAction player_action, int player_hand_index);
 
 double game_resolve(GameState* game_state);
+
+bool game_should_offer_insurance(GameState* game_state);
+
+void game_take_insurance(GameState* game_state, double insurance_bet);
 
 void game_destroy(GameState* game_state);

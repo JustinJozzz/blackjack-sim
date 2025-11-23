@@ -1,4 +1,5 @@
 #include "game.h"
+#include "card.h"
 #include <stdlib.h>
 
 #define DEFUALT_HAND_SIZE 2
@@ -13,12 +14,16 @@ void game_init(GameState* game_state, Rules* rules, double initial_bet) {
 
     game_state->player_hands = malloc(sizeof(Hand) * rules->max_splits + 1);
 
-    hand_init(&game_state->player_hands[0]);
+    for (int i = 0; i < rules->max_splits + 1; i++) {
+        hand_init(&game_state->player_hands[i]);
+    }
+
     game_state->num_player_hands = 0;
     hand_init(&game_state->dealer_hand);
 
     game_state->player_bets = malloc(sizeof(double) * rules->max_splits + 1);
     game_state->player_bets[0] = initial_bet;
+    game_state->insurance_bet = 0;
     game_state->surrendered = false;
     game_state->game_over = false;
 }
@@ -77,16 +82,30 @@ double game_resolve(GameState* game_state) {
             multiplier += REGULAR_WIN_MULTIPLIER;
         } else if (player_hand_value > 21 || player_hand_value < dealer_hand_value) {
             multiplier = 0.0;
-        } else if (hand_is_blackjack(&game_state->player_hands[i]) && game_state->num_player_hands == 1) {
+        } else if (hand_is_blackjack(&game_state->player_hands[i]) && !hand_is_blackjack(&game_state->dealer_hand) && game_state->num_player_hands == 1) {
+            // Player has blackjack and dealer doesn't: 3:2 payout
             multiplier += game_state->rules.blackjack_payout;
         } else if (player_hand_value > dealer_hand_value) {
             multiplier += REGULAR_WIN_MULTIPLIER;
         }
+        // Otherwise: push (player_hand_value == dealer_hand_value), multiplier stays at 1.0
 
         total_payout += game_state->player_bets[i] * multiplier;
     }
 
+    if (game_state->insurance_bet > 0 && hand_is_blackjack(&game_state->dealer_hand)) {
+        total_payout += game_state->insurance_bet * game_state->rules.insurance_payout;
+    }
+
     return total_payout;
+}
+
+bool game_should_offer_insurance(GameState* game_state) {
+    return card_rank(game_state->dealer_hand.cards[0]) == 0;
+}
+
+void game_take_insurance(GameState* game_state, double insurance_bet) {
+    game_state->insurance_bet = insurance_bet;
 }
 
 void game_destroy(GameState* game_state) {
